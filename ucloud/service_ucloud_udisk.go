@@ -1,6 +1,8 @@
 package ucloud
 
 import (
+	"fmt"
+
 	"github.com/ucloud/ucloud-sdk-go/services/udisk"
 	"github.com/ucloud/ucloud-sdk-go/ucloud"
 )
@@ -16,7 +18,9 @@ func (client *UCloudClient) describeDiskById(diskId string) (*udisk.UDiskDataSet
 	if err != nil {
 		return nil, err
 	}
-
+	if resp.GetRetCode() != 0 {
+		return nil, fmt.Errorf("error on reading disk %q, %s", diskId, resp.GetMessage())
+	}
 	if len(resp.DataSet) < 1 {
 		return nil, newNotFoundError(getNotFoundMessage("disk", diskId))
 	}
@@ -32,7 +36,9 @@ func (client *UCloudClient) describeDiskResource(diskId, resourceId string) (*ud
 	if err != nil {
 		return nil, err
 	}
-
+	if resp.GetRetCode() != 0 {
+		return nil, fmt.Errorf("error on reading disk_attachment %q, %s", diskId, resp.GetMessage())
+	}
 	if len(resp.DataSet) < 1 {
 		return nil, newNotFoundError(getNotFoundMessage("disk_attachment", diskId))
 	}

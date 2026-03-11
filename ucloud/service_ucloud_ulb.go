@@ -113,7 +113,9 @@ func (client *UCloudClient) describeLBSSLById(sslId string) (*ulb.ULBSSLSet, err
 	if err != nil {
 		return nil, err
 	}
-
+	if resp.GetRetCode() != 0 {
+		return nil, fmt.Errorf("error on reading lb_ssl %q, %s", sslId, resp.GetMessage())
+	}
 	if len(resp.DataSet) < 1 {
 		return nil, newNotFoundError(getNotFoundMessage("lb_ssl", sslId))
 	}
@@ -131,7 +133,9 @@ func (c *UCloudClient) describeLBSSLAttachmentById(sslId, ulbId, vserverId strin
 	if err != nil {
 		return nil, err
 	}
-
+	if resp.GetRetCode() != 0 {
+		return nil, fmt.Errorf("error on reading lb_ssl_attachment %q, %s", sslId, resp.GetMessage())
+	}
 	if resp == nil || len(resp.DataSet) < 1 {
 		return nil, newNotFoundError(getNotFoundMessage("lb_ssl_attachment", sslId))
 	}

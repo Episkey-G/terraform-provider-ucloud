@@ -1,6 +1,8 @@
 package ucloud
 
 import (
+	"fmt"
+
 	"github.com/ucloud/ucloud-sdk-go/services/vpc"
 	"github.com/ucloud/ucloud-sdk-go/ucloud"
 	uerr "github.com/ucloud/ucloud-sdk-go/ucloud/error"
@@ -19,7 +21,9 @@ func (c *UCloudClient) describeVPCById(vpcId string) (*vpc.VPCInfo, error) {
 	if err != nil {
 		return nil, err
 	}
-
+	if resp != nil && resp.GetRetCode() != 0 {
+		return nil, fmt.Errorf("error on reading vpc %q, %s", vpcId, resp.GetMessage())
+	}
 	if resp == nil || len(resp.DataSet) < 1 {
 		return nil, newNotFoundError(getNotFoundMessage("vpc", vpcId))
 	}
@@ -40,7 +44,9 @@ func (c *UCloudClient) describeSubnetById(subnetId string) (*vpc.SubnetInfo, err
 	if err != nil {
 		return nil, err
 	}
-
+	if resp != nil && resp.GetRetCode() != 0 {
+		return nil, fmt.Errorf("error on reading subnet %q, %s", subnetId, resp.GetMessage())
+	}
 	if resp == nil || len(resp.DataSet) < 1 {
 		return nil, newNotFoundError(getNotFoundMessage("subnet", subnetId))
 	}

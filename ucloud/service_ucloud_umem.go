@@ -1,6 +1,7 @@
 package ucloud
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/hashicorp/terraform-plugin-sdk/helper/resource"
@@ -22,7 +23,9 @@ func (c *UCloudClient) describeActiveStandbyRedisById(id string) (*umem.URedisGr
 	if err != nil {
 		return nil, err
 	}
-
+	if resp != nil && resp.GetRetCode() != 0 {
+		return nil, fmt.Errorf("error on reading redis %q, %s", id, resp.GetMessage())
+	}
 	if resp == nil || len(resp.DataSet) < 1 {
 		return nil, newNotFoundError(getNotFoundMessage("redis", id))
 	}
@@ -43,7 +46,9 @@ func (c *UCloudClient) describeDistributedRedisById(id string) (*umem.UMemSpaceS
 	if err != nil {
 		return nil, err
 	}
-
+	if resp != nil && resp.GetRetCode() != 0 {
+		return nil, fmt.Errorf("error on reading redis %q, %s", id, resp.GetMessage())
+	}
 	if resp == nil || len(resp.DataSet) < 1 {
 		return nil, newNotFoundError(getNotFoundMessage("redis", id))
 	}
@@ -64,7 +69,9 @@ func (c *UCloudClient) describeActiveStandbyMemcacheById(id string) (*pumem.UMem
 	if err != nil {
 		return nil, err
 	}
-
+	if resp != nil && resp.GetRetCode() != 0 {
+		return nil, fmt.Errorf("error on reading memcache %q, %s", id, resp.GetMessage())
+	}
 	if resp == nil || len(resp.DataSet) < 1 {
 		return nil, newNotFoundError(getNotFoundMessage("memcache", id))
 	}

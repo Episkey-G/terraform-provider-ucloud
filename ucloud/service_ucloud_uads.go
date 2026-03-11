@@ -1,9 +1,11 @@
 package ucloud
 
 import (
+	"fmt"
+	"log"
+
 	"github.com/ucloud/ucloud-sdk-go/services/uads"
 	"github.com/ucloud/ucloud-sdk-go/ucloud"
-	"log"
 )
 
 func (client *UCloudClient) describeUADSById(id string) (*uads.ServiceInfo, error) {
@@ -15,7 +17,9 @@ func (client *UCloudClient) describeUADSById(id string) (*uads.ServiceInfo, erro
 	if err != nil {
 		return nil, err
 	}
-
+	if resp != nil && resp.GetRetCode() != 0 {
+		return nil, fmt.Errorf("error on reading uads %q, %s", id, resp.GetMessage())
+	}
 	if resp == nil || len(resp.ServiceInfo) < 1 {
 		return nil, newNotFoundError(getNotFoundMessage("uads", id))
 	}
@@ -31,7 +35,9 @@ func (client *UCloudClient) describeUADSAllowedDomain(id string, domain string) 
 	if err != nil {
 		return nil, err
 	}
-
+	if resp != nil && resp.GetRetCode() != 0 {
+		return nil, fmt.Errorf("error on reading uads allowed domain %q, %s", id, resp.GetMessage())
+	}
 	if resp == nil || len(resp.DomainList) < 1 {
 		return nil, newNotFoundError(getNotFoundMessage("uads", id))
 	}
@@ -47,7 +53,9 @@ func (client *UCloudClient) describeUADSBGPServiceIP(id string, ip string) (*uad
 	if err != nil {
 		return nil, err
 	}
-
+	if resp != nil && resp.GetRetCode() != 0 {
+		return nil, fmt.Errorf("error on reading uads bgp service ip %q, %s", id, resp.GetMessage())
+	}
 	log.Printf("%v", resp)
 
 	if resp == nil || len(resp.GameIPInfo) < 1 {
@@ -64,6 +72,9 @@ func (client *UCloudClient) describeUADSBGPServiceFwdRule(id string, ruleIndex i
 	resp, err := client.uadsconn.GetBGPServiceFwdRule(req)
 	if err != nil {
 		return nil, err
+	}
+	if resp != nil && resp.GetRetCode() != 0 {
+		return nil, fmt.Errorf("error on reading uads bgp service fwd rule %q, %s", id, resp.GetMessage())
 	}
 	if resp == nil || len(resp.RuleInfo) < 1 {
 		return nil, newNotFoundError(getNotFoundMessage("uads", id))

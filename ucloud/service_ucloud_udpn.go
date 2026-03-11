@@ -1,6 +1,8 @@
 package ucloud
 
 import (
+	"fmt"
+
 	"github.com/ucloud/ucloud-sdk-go/services/udpn"
 	"github.com/ucloud/ucloud-sdk-go/ucloud"
 )
@@ -18,7 +20,9 @@ func (c *UCloudClient) describeDPNById(id string) (*udpn.UDPNData, error) {
 	if err != nil {
 		return nil, err
 	}
-
+	if resp != nil && resp.GetRetCode() != 0 {
+		return nil, fmt.Errorf("error on reading dpn %q, %s", id, resp.GetMessage())
+	}
 	if resp == nil || len(resp.DataSet) < 1 {
 		return nil, newNotFoundError(getNotFoundMessage("dpn", id))
 	}

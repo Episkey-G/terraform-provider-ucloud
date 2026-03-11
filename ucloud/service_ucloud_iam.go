@@ -1,10 +1,12 @@
 package ucloud
 
 import (
-	"github.com/ucloud/ucloud-sdk-go/services/iam"
-	"github.com/ucloud/ucloud-sdk-go/ucloud"
+	"fmt"
 	"strconv"
 	"strings"
+
+	"github.com/ucloud/ucloud-sdk-go/services/iam"
+	"github.com/ucloud/ucloud-sdk-go/ucloud"
 )
 
 func (client *UCloudClient) describeAccessKey(userName, accessKeyID string) (*iam.AccessKey, error) {
@@ -20,6 +22,9 @@ func (client *UCloudClient) describeAccessKey(userName, accessKeyID string) (*ia
 	resp, err := client.iamconn.ListAccessKeys(req)
 	if err != nil {
 		return nil, err
+	}
+	if resp.GetRetCode() != 0 {
+		return nil, fmt.Errorf("error on reading access_key %q, %s", accessKeyID, resp.GetMessage())
 	}
 	if len(resp.AccessKey) < 1 {
 		return nil, newNotFoundError(getNotFoundMessage("access_key", accessKeyID))

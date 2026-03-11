@@ -1,6 +1,8 @@
 package ucloud
 
 import (
+	"fmt"
+
 	"github.com/ucloud/ucloud-sdk-go/services/uk8s"
 	"github.com/ucloud/ucloud-sdk-go/ucloud"
 	uerr "github.com/ucloud/ucloud-sdk-go/ucloud/error"
@@ -16,6 +18,9 @@ func (client *UCloudClient) describeUK8SClusterById(instanceId string) (*uk8s.Cl
 	resp, err := client.uk8sconn.ListUK8SClusterV2(req)
 	if err != nil {
 		return nil, err
+	}
+	if resp.GetRetCode() != 0 {
+		return nil, fmt.Errorf("error on reading uk8s_cluster %q, %s", instanceId, resp.GetMessage())
 	}
 	if len(resp.ClusterSet) < 1 {
 		return nil, newNotFoundError(getNotFoundMessage("uk8s_cluster", instanceId))
