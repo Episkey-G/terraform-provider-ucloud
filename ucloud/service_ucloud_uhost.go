@@ -22,6 +22,9 @@ func (client *UCloudClient) describeInstanceById(instanceId string) (*uhost.UHos
 	if err != nil {
 		return nil, err
 	}
+	if resp.GetRetCode() != 0 {
+		return nil, fmt.Errorf("error on reading instance %q, %s", instanceId, resp.GetMessage())
+	}
 	if len(resp.UHostSet) < 1 {
 		return nil, newNotFoundError(getNotFoundMessage("instance", instanceId))
 	}
@@ -39,6 +42,9 @@ func (client *UCloudClient) describeImageById(imageId string) (*uhost.UHostImage
 	resp, err := client.uhostconn.DescribeImage(req)
 	if err != nil {
 		return nil, err
+	}
+	if resp.GetRetCode() != 0 {
+		return nil, fmt.Errorf("error on reading image %q, %s", imageId, resp.GetMessage())
 	}
 	if len(resp.ImageSet) < 1 {
 		return nil, newNotFoundError(getNotFoundMessage("image", imageId))

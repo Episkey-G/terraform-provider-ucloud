@@ -1,6 +1,8 @@
 package ucloud
 
 import (
+	"fmt"
+
 	"github.com/ucloud/ucloud-sdk-go/services/ufs"
 	"github.com/ucloud/ucloud-sdk-go/ucloud"
 	uerr "github.com/ucloud/ucloud-sdk-go/ucloud/error"
@@ -16,6 +18,9 @@ func (client *UCloudClient) describeUFSVolumeById(instanceId string) (*ufs.UFSVo
 	resp, err := client.ufsconn.DescribeUFSVolume2(req)
 	if err != nil {
 		return nil, err
+	}
+	if resp.GetRetCode() != 0 {
+		return nil, fmt.Errorf("error on reading ufs_volume %q, %s", instanceId, resp.GetMessage())
 	}
 	if len(resp.DataSet) < 1 {
 		return nil, newNotFoundError(getNotFoundMessage("ufs_volume", instanceId))

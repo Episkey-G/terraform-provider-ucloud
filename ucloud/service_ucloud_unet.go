@@ -22,7 +22,9 @@ func (c *UCloudClient) describeEIPById(eipId string) (*unet.UnetEIPSet, error) {
 	if err != nil {
 		return nil, err
 	}
-
+	if resp != nil && resp.GetRetCode() != 0 {
+		return nil, fmt.Errorf("error on reading eip %q, %s", eipId, resp.GetMessage())
+	}
 	if resp == nil || len(resp.EIPSet) < 1 {
 		return nil, newNotFoundError(getNotFoundMessage("eip", eipId))
 	}
@@ -40,7 +42,9 @@ func (c *UCloudClient) describeEIPResourceById(eipId, resourceId string) (*unet.
 	if err != nil {
 		return nil, err
 	}
-
+	if resp != nil && resp.GetRetCode() != 0 {
+		return nil, fmt.Errorf("error on reading eip association %q, %s", eipId, resp.GetMessage())
+	}
 	if resp == nil || len(resp.EIPSet) < 1 {
 		return nil, newNotFoundError(getNotFoundMessage("eip association", eipId))
 	}
@@ -112,7 +116,9 @@ func (c *UCloudClient) describeVIPById(vipId string) (*vpc.VIPDetailSet, error) 
 	if err != nil {
 		return nil, err
 	}
-
+	if resp != nil && resp.GetRetCode() != 0 {
+		return nil, fmt.Errorf("error on reading vip %q, %s", vipId, resp.GetMessage())
+	}
 	if resp == nil || len(resp.VIPSet) < 1 {
 		return nil, newNotFoundError(getNotFoundMessage("vip", vipId))
 	}
