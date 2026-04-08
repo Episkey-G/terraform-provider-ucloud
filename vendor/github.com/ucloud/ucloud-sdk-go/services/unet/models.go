@@ -78,6 +78,21 @@ type UnetBandwidthUsageEIPSet struct {
 }
 
 /*
+EIPBinding - EIP绑定内网IP关系数据
+*/
+type EIPBinding struct {
+
+	// 外网ip
+	EIP string
+
+	// 内网ip
+	PrivateIP string
+
+	// 内网ip类型：PrimaryIP（默认）、SecondaryIP（非默认）
+	PrivateIPType string
+}
+
+/*
 ShareBandwidthSet - DescribeEIP
 */
 type ShareBandwidthSet struct {
@@ -120,21 +135,6 @@ type UnetEIPResourceSet struct {
 
 	// 资源绑定的虚拟网卡的类型。uni，虚拟网卡。
 	SubResourceType string
-}
-
-/*
-EIPBinding - EIP绑定内网IP关系数据
-*/
-type EIPBinding struct {
-
-	// 外网ip
-	EIP string
-
-	// 内网ip
-	PrivateIP string
-
-	// 内网ip类型：PrimaryIP（默认）、SecondaryIP（非默认）
-	PrivateIPType string
 }
 
 /*
@@ -288,6 +288,36 @@ type ResourceSet struct {
 
 	// 可用区
 	Zone int
+}
+
+/*
+DescribeSecondaryIPDataSet - 描述内网IP的具体信息
+*/
+type DescribeSecondaryIPDataSet struct {
+
+	// 外网IP
+	EIP string
+
+	// EIP资源ID
+	EIPId string
+
+	// 内网IP
+	PrivateIP string
+
+	// 内网IP类型；枚举值：PrimaryIP：主内网IP，SecondaryIP：辅助内网IP
+	PrivateIPType string
+
+	// 资源ID
+	ResourceID string
+
+	// 资源名称
+	ResourceName string
+
+	// 子网ID
+	SubnetID string
+
+	// VPCID
+	VPCID string
 }
 
 /*

@@ -9,6 +9,62 @@ import (
 
 // ULB API Schema
 
+// AddSSLBindingRequest is request schema for AddSSLBinding action
+type AddSSLBindingRequest struct {
+	request.CommonBase
+
+	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
+	// ProjectId *string `required:"true"`
+
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
+	// Region *string `required:"true"`
+
+	// 监听器的ID
+	ListenerId *string `required:"true"`
+
+	// 负载均衡实例的ID
+	LoadBalancerId *string `required:"true"`
+
+	// SSLId的数组
+	SSLIds []string `required:"true"`
+}
+
+// AddSSLBindingResponse is response schema for AddSSLBinding action
+type AddSSLBindingResponse struct {
+	response.CommonBase
+}
+
+// NewAddSSLBindingRequest will create request of AddSSLBinding action.
+func (c *ULBClient) NewAddSSLBindingRequest() *AddSSLBindingRequest {
+	req := &AddSSLBindingRequest{}
+
+	// setup request with client config
+	c.Client.SetupRequest(req)
+
+	// setup retryable with default retry policy (retry for non-create action and common error)
+	req.SetRetryable(false)
+	return req
+}
+
+/*
+API: AddSSLBinding
+
+ALB的监听器绑定SSL证书
+*/
+func (c *ULBClient) AddSSLBinding(req *AddSSLBindingRequest) (*AddSSLBindingResponse, error) {
+	var err error
+	var res AddSSLBindingResponse
+
+	reqCopier := *req
+
+	err = c.Client.InvokeAction("AddSSLBinding", &reqCopier, &res)
+	if err != nil {
+		return &res, err
+	}
+
+	return &res, nil
+}
+
 /*
 AddTargetsParamTargets is request schema for complex param
 */
@@ -188,11 +244,17 @@ func (c *ULBClient) AllocateBackend(req *AllocateBackendRequest) (*AllocateBacke
 type AllocateBackendBatchRequest struct {
 	request.CommonBase
 
+	// [公共参数]
+	// ProjectId *string `required:"true"`
+
+	// [公共参数]
+	// Region *string `required:"true"`
+
 	//
 	ApiVersion *int `required:"false"`
 
 	//
-	Backends []string `required:"true"`
+	Backends []string `required:"false"`
 
 	//
 	ULBId *string `required:"true"`
@@ -320,10 +382,16 @@ type CreateListenerParamHealthCheckConfig struct {
 	// 是否开启健康检查功能。暂时不支持关闭。默认值为：true
 	Enabled *bool `required:"false"`
 
+	// （应用型专用）HTTP检查方法。只支持GET和HEAD。
+	Method *string `required:"false"`
+
 	// （应用型专用）HTTP检查路径
 	Path *string `required:"false"`
 
-	// 健康检查方式。应用型限定取值：“Port”/"HTTP"，默认值：“Port”
+	// （应用型专用）GRPC检查响应码
+	ResponseCode *string `required:"false"`
+
+	// 健康检查方式。应用型限定取值：“Port”/"HTTP/GRPC"，默认值：“Port”
 	Type *string `required:"false"`
 }
 
@@ -422,6 +490,30 @@ func (c *ULBClient) CreateListener(req *CreateListenerRequest) (*CreateListenerR
 	return &res, nil
 }
 
+/*
+CreateLoadBalancerParamSecGroups is request schema for complex param
+*/
+type CreateLoadBalancerParamSecGroups struct {
+
+	// 安全组优先级
+	Priority *int `required:"false"`
+
+	// 安全组id
+	SecGroupId *string `required:"false"`
+}
+
+/*
+CreateLoadBalancerParamLabelInfos is request schema for complex param
+*/
+type CreateLoadBalancerParamLabelInfos struct {
+
+	// 标签键
+	Key *string `required:"false"`
+
+	// 标签值
+	Value *string `required:"false"`
+}
+
 // CreateLoadBalancerRequest is request schema for CreateLoadBalancer action
 type CreateLoadBalancerRequest struct {
 	request.CommonBase
@@ -441,6 +533,9 @@ type CreateLoadBalancerRequest struct {
 	// 负载均衡实例的IP协议。限定枚举值："IPv4" / "IPv6"/"DualStack"，默认值为：“IPv4”
 	IPVersion *string `required:"false"`
 
+	//
+	LabelInfos []CreateLoadBalancerParamLabelInfos `required:"false"`
+
 	// 负载均衡实例的名称。默认值：lb；特殊字符仅支持：“-”，“_”，“.”；限定字符长度：[1-255]
 	Name *string `required:"false"`
 
@@ -449,6 +544,9 @@ type CreateLoadBalancerRequest struct {
 
 	// 负载均衡实例的备注信息。限定字符长度：[0-255]
 	Remark *string `required:"false"`
+
+	//
+	SecGroups []CreateLoadBalancerParamSecGroups `required:"false"`
 
 	// 负载均衡实例所属的子网资源ID。负载均衡实例的内网VIP和SNAT场景的源IP限定在该子网内；指定子网不影响添加后端服务节点时的范围，依旧是整个VPC下支持的资源
 	SubnetId *string `required:"true"`
@@ -573,56 +671,6 @@ func (c *ULBClient) CreatePolicy(req *CreatePolicyRequest) (*CreatePolicyRespons
 	return &res, nil
 }
 
-// CreatePolicyGroupRequest is request schema for CreatePolicyGroup action
-type CreatePolicyGroupRequest struct {
-	request.CommonBase
-
-	// [公共参数] 地域。 参见 [地域和可用区列表](../summary/regionlist.html)
-	// Region *string `required:"true"`
-
-	// 内容转发策略组名称，默认为空
-	GroupName *string `required:"false"`
-}
-
-// CreatePolicyGroupResponse is response schema for CreatePolicyGroup action
-type CreatePolicyGroupResponse struct {
-	response.CommonBase
-
-	// 内容转发策略组的Id
-	GroupId string
-}
-
-// NewCreatePolicyGroupRequest will create request of CreatePolicyGroup action.
-func (c *ULBClient) NewCreatePolicyGroupRequest() *CreatePolicyGroupRequest {
-	req := &CreatePolicyGroupRequest{}
-
-	// setup request with client config
-	c.Client.SetupRequest(req)
-
-	// setup retryable with default retry policy (retry for non-create action and common error)
-	req.SetRetryable(false)
-	return req
-}
-
-/*
-API: CreatePolicyGroup
-
-创建内容转发策略组
-*/
-func (c *ULBClient) CreatePolicyGroup(req *CreatePolicyGroupRequest) (*CreatePolicyGroupResponse, error) {
-	var err error
-	var res CreatePolicyGroupResponse
-
-	reqCopier := *req
-
-	err = c.Client.InvokeAction("CreatePolicyGroup", &reqCopier, &res)
-	if err != nil {
-		return &res, err
-	}
-
-	return &res, nil
-}
-
 /*
 CreateRuleParamRuleActionsForwardConfigTargets is request schema for complex param
 */
@@ -633,24 +681,6 @@ type CreateRuleParamRuleActionsForwardConfigTargets struct {
 
 	// 转发的后端服务节点的权重。仅监听器负载均衡算法是加权轮询是有效
 	Weight *int `required:"false"`
-}
-
-/*
-CreateRuleParamRuleActionsForwardConfig is request schema for complex param
-*/
-type CreateRuleParamRuleActionsForwardConfig struct {
-
-	//
-	Targets []CreateRuleParamRuleActionsForwardConfigTargets `required:"false"`
-}
-
-/*
-CreateRuleParamRuleConditionsPathConfig is request schema for complex param
-*/
-type CreateRuleParamRuleConditionsPathConfig struct {
-
-	// 取值。暂时只支持数组长度为1；取值需符合相关条件；路径匹配时必填
-	Values []string `required:"false"`
 }
 
 /*
@@ -666,15 +696,12 @@ type CreateRuleParamRuleConditionsHostConfig struct {
 }
 
 /*
-CreateRuleParamRuleActions is request schema for complex param
+CreateRuleParamRuleConditionsPathConfig is request schema for complex param
 */
-type CreateRuleParamRuleActions struct {
+type CreateRuleParamRuleConditionsPathConfig struct {
 
-	//
-	ForwardConfig *CreateRuleParamRuleActionsForwardConfig `required:"false"`
-
-	// 动作类型。限定枚举值："Forward"；RuleActions暂支持长度为1
-	Type *string `required:"true"`
+	// 取值。暂时只支持数组长度为1；取值需符合相关条件；路径匹配时必填
+	Values []string `required:"false"`
 }
 
 /*
@@ -689,6 +716,102 @@ type CreateRuleParamRuleConditions struct {
 	PathConfig *CreateRuleParamRuleConditionsPathConfig `required:"false"`
 
 	// 匹配条件类型。限定枚举值："Host"/"Path"
+	Type *string `required:"true"`
+}
+
+/*
+CreateRuleParamRuleActionsForwardConfig is request schema for complex param
+*/
+type CreateRuleParamRuleActionsForwardConfig struct {
+
+	//
+	Targets []CreateRuleParamRuleActionsForwardConfigTargets `required:"false"`
+}
+
+/*
+CreateRuleParamRuleActionsRemoveHeaderConfig is request schema for complex param
+*/
+type CreateRuleParamRuleActionsRemoveHeaderConfig struct {
+
+	// 删除的 header 字段名称，目前只能删除以下几个默认配置的字段X-Real-IP、X-Forwarded-For、X-Forwarded-Proto、X-Forwarded-SrcPort
+	Key *string `required:"false"`
+}
+
+/*
+CreateRuleParamRuleActionsCorsConfig is request schema for complex param
+*/
+type CreateRuleParamRuleActionsCorsConfig struct {
+
+	// 是否允许携带凭证信息。取值：on：是。off：否。
+	AllowCredentials *string `required:"false"`
+
+	// 允许跨域的 Header 列表。支持配置为*或配置一个或多个 value 值。单个 value 值只允许包含大小写字母、数字，不能以下划线（_）和短划线（-）开头或结尾，最大长度限制为 32 个字符。最多支持20个值
+	AllowHeaders []string `required:"false"`
+
+	// 选择跨域访问时允许的 HTTP 方法。取值：GET。POST。PUT。DELETE。HEAD。OPTIONS。PATCH。
+	AllowMethods []string `required:"false"`
+
+	// 允许的访问来源列表。支持只配置一个元素*，或配置一个或多个值。单个值必须以http://或者https://开头，后边加一个正确的域名或一级泛域名。（例：http://*.test.abc.example.com）单个值可以不加端口，也可以指定端口，端口范围：1~65535。最多支持5个值
+	AllowOrigin []string `required:"false"`
+
+	// 允许暴露的 Header 列表。支持配置为*或配置一个或多个 value 值。单个 value 值只允许包含大小写字母、数字，不能以下划线（_）和短划线（-）开头或结尾，最大长度限制为 32 个字符。最多支持20个值
+	ExposeHeaders []string `required:"false"`
+
+	// 预检请求在浏览器的最大缓存时间，单位：秒。取值范围：-1~172800。
+	MaxAge *int `required:"false"`
+}
+
+/*
+CreateRuleParamRuleActionsFixedResponseConfig is request schema for complex param
+*/
+type CreateRuleParamRuleActionsFixedResponseConfig struct {
+
+	// 返回的固定内容。最大支持存储 1 KB，只支持 ASCII 码值ch >= 32 && ch < 127范围内、不包括 $ 的可打印字符。
+	Content *string `required:"false"`
+
+	// 返回的 HTTP 响应码，仅支持 2xx、4xx、5xx 数字，x 为任意数字。
+	HttpCode *int `required:"false"`
+}
+
+/*
+CreateRuleParamRuleActionsInsertHeaderConfig is request schema for complex param
+*/
+type CreateRuleParamRuleActionsInsertHeaderConfig struct {
+
+	// 插入的 header 字段名称，长度为 1~40 个字符，支持大小写字母 a~z、数字、下划线（_）和短划线（-）。头字段名称不能重复用于InsertHeader中。header 字段不能使用以下(此处判断大小写不敏感)x-real-ip、x-forwarded-for、x-forwarded-proto、x-forwarded-srcport、ucloud-alb-trace、connection、upgrade、content-length、transfer-encoding、keep-alive、te、host、cookie、remoteip、authority
+	Key *string `required:"false"`
+
+	// 插入的 header 字段内容。ValueType 取值为 SystemDefined 时取值如下：ClientSrcPort：客户端端口。ClientSrcIp：客户端 IP 地址。Protocol：客户端请求的协议（HTTP 或 HTTPS)。RuleID：客户端请求命中的转发规则ID。ALBID：ALB ID。ALBPort：ALB 端口。ValueType 取值为 UserDefined 时：可以自定义头字段内容，限制长度为 1~128 个字符，只支持 ASCII 码值ch >= 32 && ch < 127范围内、不包括 $ 的可打印字符。ValueType 取值为 ReferenceHeader 时：可以引用请求头字段中的某一个字段，限制长度限制为 1~128 个字符，支持小写字母 a~z、数字、短划线（-）和下划线（_）。
+	Value *string `required:"false"`
+
+	// 头字段内容类型。取值：UserDefined：用户指定。ReferenceHeader：引用用户请求头中的某一个字段。SystemDefined：系统定义。
+	ValueType *string `required:"false"`
+}
+
+/*
+CreateRuleParamRuleActions is request schema for complex param
+*/
+type CreateRuleParamRuleActions struct {
+
+	//
+	CorsConfig *CreateRuleParamRuleActionsCorsConfig `required:"false"`
+
+	//
+	FixedResponseConfig *CreateRuleParamRuleActionsFixedResponseConfig `required:"false"`
+
+	//
+	ForwardConfig *CreateRuleParamRuleActionsForwardConfig `required:"false"`
+
+	//
+	InsertHeaderConfig *CreateRuleParamRuleActionsInsertHeaderConfig `required:"false"`
+
+	// 转发规则动作执行的顺序，取值为1~1000，按值从小到大执行动作。值不能为空，不能重复。Forward、FixedResponse 类型的动作不判断 Order，最后一个执行
+	Order *int `required:"false"`
+
+	//
+	RemoveHeaderConfig *CreateRuleParamRuleActionsRemoveHeaderConfig `required:"false"`
+
+	// 动作类型。限定枚举值："Forward"、"InsertHeader"、"Cors"、"FixedResponse"、"RemoveHeader"。只会处理 Type 对应的结构体。
 	Type *string `required:"true"`
 }
 
@@ -905,6 +1028,9 @@ type CreateULBRequest struct {
 
 	// 防火墙ID，如果不传，则默认不绑定防火墙
 	FirewallId *string `required:"false"`
+
+	// 【该字段已废弃，请谨慎使用】
+	IPVersion *string `required:"false" deprecated:"true"`
 
 	// 创建的CLB是否为内网模式
 	InnerMode *string `required:"false"`
@@ -1242,53 +1368,6 @@ func (c *ULBClient) DeletePolicy(req *DeletePolicyRequest) (*DeletePolicyRespons
 	return &res, nil
 }
 
-// DeletePolicyGroupRequest is request schema for DeletePolicyGroup action
-type DeletePolicyGroupRequest struct {
-	request.CommonBase
-
-	// [公共参数] 地域。 参见 [地域和可用区列表](../summary/regionlist.html)
-	// Region *string `required:"true"`
-
-	// 内容转发策略组ID
-	GroupId *string `required:"true"`
-}
-
-// DeletePolicyGroupResponse is response schema for DeletePolicyGroup action
-type DeletePolicyGroupResponse struct {
-	response.CommonBase
-}
-
-// NewDeletePolicyGroupRequest will create request of DeletePolicyGroup action.
-func (c *ULBClient) NewDeletePolicyGroupRequest() *DeletePolicyGroupRequest {
-	req := &DeletePolicyGroupRequest{}
-
-	// setup request with client config
-	c.Client.SetupRequest(req)
-
-	// setup retryable with default retry policy (retry for non-create action and common error)
-	req.SetRetryable(true)
-	return req
-}
-
-/*
-API: DeletePolicyGroup
-
-删除内容转发策略组
-*/
-func (c *ULBClient) DeletePolicyGroup(req *DeletePolicyGroupRequest) (*DeletePolicyGroupResponse, error) {
-	var err error
-	var res DeletePolicyGroupResponse
-
-	reqCopier := *req
-
-	err = c.Client.InvokeAction("DeletePolicyGroup", &reqCopier, &res)
-	if err != nil {
-		return &res, err
-	}
-
-	return &res, nil
-}
-
 // DeleteRuleRequest is request schema for DeleteRule action
 type DeleteRuleRequest struct {
 	request.CommonBase
@@ -1388,6 +1467,62 @@ func (c *ULBClient) DeleteSSL(req *DeleteSSLRequest) (*DeleteSSLResponse, error)
 	reqCopier := *req
 
 	err = c.Client.InvokeAction("DeleteSSL", &reqCopier, &res)
+	if err != nil {
+		return &res, err
+	}
+
+	return &res, nil
+}
+
+// DeleteSSLBindingRequest is request schema for DeleteSSLBinding action
+type DeleteSSLBindingRequest struct {
+	request.CommonBase
+
+	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
+	// ProjectId *string `required:"true"`
+
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
+	// Region *string `required:"true"`
+
+	// 监听器的ID
+	ListenerId *string `required:"true"`
+
+	// 负载均衡实例的ID
+	LoadBalancerId *string `required:"true"`
+
+	// SSLId的数组
+	SSLIds []string `required:"true"`
+}
+
+// DeleteSSLBindingResponse is response schema for DeleteSSLBinding action
+type DeleteSSLBindingResponse struct {
+	response.CommonBase
+}
+
+// NewDeleteSSLBindingRequest will create request of DeleteSSLBinding action.
+func (c *ULBClient) NewDeleteSSLBindingRequest() *DeleteSSLBindingRequest {
+	req := &DeleteSSLBindingRequest{}
+
+	// setup request with client config
+	c.Client.SetupRequest(req)
+
+	// setup retryable with default retry policy (retry for non-create action and common error)
+	req.SetRetryable(true)
+	return req
+}
+
+/*
+API: DeleteSSLBinding
+
+删除监听器绑定的扩展证书
+*/
+func (c *ULBClient) DeleteSSLBinding(req *DeleteSSLBindingRequest) (*DeleteSSLBindingResponse, error) {
+	var err error
+	var res DeleteSSLBindingResponse
+
+	reqCopier := *req
+
+	err = c.Client.InvokeAction("DeleteSSLBinding", &reqCopier, &res)
 	if err != nil {
 		return &res, err
 	}
@@ -1683,62 +1818,6 @@ func (c *ULBClient) DescribeLoadBalancers(req *DescribeLoadBalancersRequest) (*D
 	reqCopier := *req
 
 	err = c.Client.InvokeAction("DescribeLoadBalancers", &reqCopier, &res)
-	if err != nil {
-		return &res, err
-	}
-
-	return &res, nil
-}
-
-// DescribePolicyGroupRequest is request schema for DescribePolicyGroup action
-type DescribePolicyGroupRequest struct {
-	request.CommonBase
-
-	// [公共参数] 地域。 参见 [地域和可用区列表](../summary/regionlist.html)
-	// Region *string `required:"true"`
-
-	// 内容转发策略组ID
-	GroupId *string `required:"false"`
-
-	// 数据分页值，默认为20
-	Limit *int `required:"false"`
-
-	// 数据偏移量，默认值为0
-	Offset *int `required:"false"`
-}
-
-// DescribePolicyGroupResponse is response schema for DescribePolicyGroup action
-type DescribePolicyGroupResponse struct {
-	response.CommonBase
-
-	// 内容转发策略组列表，具体结构见 UlbPolicyGroupSet
-	DataSet []UlbPolicyGroupSet
-}
-
-// NewDescribePolicyGroupRequest will create request of DescribePolicyGroup action.
-func (c *ULBClient) NewDescribePolicyGroupRequest() *DescribePolicyGroupRequest {
-	req := &DescribePolicyGroupRequest{}
-
-	// setup request with client config
-	c.Client.SetupRequest(req)
-
-	// setup retryable with default retry policy (retry for non-create action and common error)
-	req.SetRetryable(true)
-	return req
-}
-
-/*
-API: DescribePolicyGroup
-
-获取内容转发组详细信息
-*/
-func (c *ULBClient) DescribePolicyGroup(req *DescribePolicyGroupRequest) (*DescribePolicyGroupResponse, error) {
-	var err error
-	var res DescribePolicyGroupResponse
-
-	reqCopier := *req
-
-	err = c.Client.InvokeAction("DescribePolicyGroup", &reqCopier, &res)
 	if err != nil {
 		return &res, err
 	}
@@ -2669,24 +2748,6 @@ func (c *ULBClient) UpdateBackendBatch(req *UpdateBackendBatchRequest) (*UpdateB
 }
 
 /*
-UpdateListenerAttributeParamHealthCheckConfig is request schema for complex param
-*/
-type UpdateListenerAttributeParamHealthCheckConfig struct {
-
-	// （应用型专用）HTTP检查域名
-	Domain *string `required:"false"`
-
-	// 是否开启健康检查功能。暂时不支持关闭；默认值为：true
-	Enabled *bool `required:"false"`
-
-	// （应用型专用）HTTP检查路径
-	Path *string `required:"false"`
-
-	// 健康检查方式。应用型限定取值：“Port”/"HTTP"；默认值：“Port”
-	Type *string `required:"false"`
-}
-
-/*
 UpdateListenerAttributeParamStickinessConfig is request schema for complex param
 */
 type UpdateListenerAttributeParamStickinessConfig struct {
@@ -2697,7 +2758,31 @@ type UpdateListenerAttributeParamStickinessConfig struct {
 	// 是否开启会话保持功能。应用型负载均衡实例基于Cookie实现，网络型负载均衡则基于源IP，保证在对应的空闲超时时间内，同一个源IP送到同一个服务节点。默认值为：false
 	Enabled *bool `required:"false"`
 
-	// （应用型专用）Cookie处理方式。限定枚举值："ServerInsert" / "UserDefined"，默认值为：“ServerInsert”
+	// （应用型专用）Cookie处理方式。限定枚举值："ServerInsert" / "UserDefined"，不传值则不修改
+	Type *string `required:"false"`
+}
+
+/*
+UpdateListenerAttributeParamHealthCheckConfig is request schema for complex param
+*/
+type UpdateListenerAttributeParamHealthCheckConfig struct {
+
+	// （应用型专用）HTTP检查域名
+	Domain *string `required:"false"`
+
+	// 是否开启健康检查功能。暂时不支持关闭；默认值为：true
+	Enabled *bool `required:"false"`
+
+	// （应用型专用）HTTP检查方法。只支持GET和HEAD。
+	Method *string `required:"false"`
+
+	// （应用型专用）HTTP检查路径
+	Path *string `required:"false"`
+
+	// （应用型专用）GRPC检查响应码
+	ResponseCode *string `required:"false"`
+
+	// 健康检查方式。应用型限定取值：“Port”/"HTTP"；默认值：“Port”
 	Type *string `required:"false"`
 }
 
@@ -2941,54 +3026,25 @@ func (c *ULBClient) UpdatePolicy(req *UpdatePolicyRequest) (*UpdatePolicyRespons
 	return &res, nil
 }
 
-// UpdatePolicyGroupAttributeRequest is request schema for UpdatePolicyGroupAttribute action
-type UpdatePolicyGroupAttributeRequest struct {
-	request.CommonBase
+/*
+UpdateRuleAttributeParamRuleConditionsHostConfig is request schema for complex param
+*/
+type UpdateRuleAttributeParamRuleConditionsHostConfig struct {
 
-	// [公共参数] 地域。 参见 [地域和可用区列表](../summary/regionlist.html)
-	// Region *string `required:"true"`
+	// 匹配方式。限定枚举值："Regular"/"Wildcard"，默认值："Regular"
+	MatchMode *string `required:"false"`
 
-	// 内容转发策略组ID
-	GroupId *string `required:"true"`
-
-	// 修改策略转发组名称
-	GroupName *string `required:"false"`
-}
-
-// UpdatePolicyGroupAttributeResponse is response schema for UpdatePolicyGroupAttribute action
-type UpdatePolicyGroupAttributeResponse struct {
-	response.CommonBase
-}
-
-// NewUpdatePolicyGroupAttributeRequest will create request of UpdatePolicyGroupAttribute action.
-func (c *ULBClient) NewUpdatePolicyGroupAttributeRequest() *UpdatePolicyGroupAttributeRequest {
-	req := &UpdatePolicyGroupAttributeRequest{}
-
-	// setup request with client config
-	c.Client.SetupRequest(req)
-
-	// setup retryable with default retry policy (retry for non-create action and common error)
-	req.SetRetryable(true)
-	return req
+	// 取值。暂时只支持数组长度为1；取值需符合相关匹配方式的条件；修改域名匹配时必填
+	Values []string `required:"false"`
 }
 
 /*
-API: UpdatePolicyGroupAttribute
-
-更新内容转发策略组属性
+UpdateRuleAttributeParamRuleConditionsPathConfig is request schema for complex param
 */
-func (c *ULBClient) UpdatePolicyGroupAttribute(req *UpdatePolicyGroupAttributeRequest) (*UpdatePolicyGroupAttributeResponse, error) {
-	var err error
-	var res UpdatePolicyGroupAttributeResponse
+type UpdateRuleAttributeParamRuleConditionsPathConfig struct {
 
-	reqCopier := *req
-
-	err = c.Client.InvokeAction("UpdatePolicyGroupAttribute", &reqCopier, &res)
-	if err != nil {
-		return &res, err
-	}
-
-	return &res, nil
+	// 取值。暂时只支持数组长度为1；取值需符合相关条件；修改路径匹配时必填
+	Values []string `required:"false"`
 }
 
 /*
@@ -3004,33 +3060,99 @@ type UpdateRuleAttributeParamRuleActionsForwardConfigTargets struct {
 }
 
 /*
-UpdateRuleAttributeParamRuleConditionsPathConfig is request schema for complex param
-*/
-type UpdateRuleAttributeParamRuleConditionsPathConfig struct {
-
-	// 取值。暂时只支持数组长度为1；取值需符合相关条件；修改路径匹配时必填
-	Values []string `required:"false"`
-}
-
-/*
-UpdateRuleAttributeParamRuleConditionsHostConfig is request schema for complex param
-*/
-type UpdateRuleAttributeParamRuleConditionsHostConfig struct {
-
-	// 匹配方式。限定枚举值："Regular"/"Wildcard"，默认值："Regular"
-	MatchMode *string `required:"false"`
-
-	// 取值。暂时只支持数组长度为1；取值需符合相关匹配方式的条件；修改域名匹配时必填
-	Values []string `required:"false"`
-}
-
-/*
 UpdateRuleAttributeParamRuleActionsForwardConfig is request schema for complex param
 */
 type UpdateRuleAttributeParamRuleActionsForwardConfig struct {
 
 	//
 	Targets []UpdateRuleAttributeParamRuleActionsForwardConfigTargets `required:"false"`
+}
+
+/*
+UpdateRuleAttributeParamRuleActionsRemoveHeaderConfig is request schema for complex param
+*/
+type UpdateRuleAttributeParamRuleActionsRemoveHeaderConfig struct {
+
+	// 删除的 header 字段名称，目前只能删除以下几个默认配置的字段X-Real-IP、X-Forwarded-For、X-Forwarded-Proto、X-Forwarded-SrcPort
+	Key *string `required:"false"`
+}
+
+/*
+UpdateRuleAttributeParamRuleActionsCorsConfig is request schema for complex param
+*/
+type UpdateRuleAttributeParamRuleActionsCorsConfig struct {
+
+	// 是否允许携带凭证信息。取值：on：是。off：否。
+	AllowCredentials *string `required:"false"`
+
+	// 允许跨域的 Header 列表。支持配置为*或配置一个或多个 value 值。单个 value 值只允许包含大小写字母、数字，不能以下划线（_）和短划线（-）开头或结尾，最大长度限制为 32 个字符。最多支持20个值
+	AllowHeaders []string `required:"false"`
+
+	// 选择跨域访问时允许的 HTTP 方法。取值：GET。POST。PUT。DELETE。HEAD。OPTIONS。PATCH。
+	AllowMethods []string `required:"false"`
+
+	// 允许的访问来源列表。支持只配置一个元素*，或配置一个或多个值。单个值必须以http://或者https://开头，后边加一个正确的域名或一级泛域名。（例：http://*.test.abc.example.com）单个值可以不加端口，也可以指定端口，端口范围：1~65535。最多支持5个值
+	AllowOrigin []string `required:"false"`
+
+	// 允许暴露的 Header 列表。支持配置为*或配置一个或多个 value 值。单个 value 值只允许包含大小写字母、数字，不能以下划线（_）和短划线（-）开头或结尾，最大长度限制为 32 个字符。最多支持20个值
+	ExposeHeaders []string `required:"false"`
+
+	// 预检请求在浏览器的最大缓存时间，单位：秒。取值范围：-1~172800。
+	MaxAge *int `required:"false"`
+}
+
+/*
+UpdateRuleAttributeParamRuleActionsFixedResponseConfig is request schema for complex param
+*/
+type UpdateRuleAttributeParamRuleActionsFixedResponseConfig struct {
+
+	// 返回的固定内容。最大支持存储 1 KB，只支持 ASCII 码值ch >= 32 && ch < 127范围内、不包括 $ 的可打印字符。
+	Content *string `required:"false"`
+
+	// 返回的 HTTP 响应码，仅支持 2xx、4xx、5xx 数字，x 为任意数字。
+	HttpCode *int `required:"false"`
+}
+
+/*
+UpdateRuleAttributeParamRuleActionsInsertHeaderConfig is request schema for complex param
+*/
+type UpdateRuleAttributeParamRuleActionsInsertHeaderConfig struct {
+
+	// 插入的 header 字段名称，长度为 1~40 个字符，支持大小写字母 a~z、数字、下划线（_）和短划线（-）。头字段名称不能重复用于InsertHeader中。header 字段不能使用以下(此处判断大小写不敏感)x-real-ip、x-forwarded-for、x-forwarded-proto、x-forwarded-srcport、ucloud-alb-trace、connection、upgrade、content-length、transfer-encoding、keep-alive、te、host、cookie、remoteip、authority
+	Key *string `required:"false"`
+
+	// 插入的 header 字段内容。ValueType 取值为 SystemDefined 时取值如下：ClientSrcPort：客户端端口。ClientSrcIp：客户端 IP 地址。Protocol：客户端请求的协议（HTTP 或 HTTPS)。RuleID：客户端请求命中的转发规则ID。ALBID：ALB ID。ALBPort：ALB 端口。ValueType 取值为 UserDefined 时：可以自定义头字段内容，限制长度为 1~128 个字符，只支持 ASCII 码值ch >= 32 && ch < 127范围内、不包括 $ 的可打印字符。ValueType 取值为 ReferenceHeader 时：可以引用请求头字段中的某一个字段，限制长度限制为 1~128 个字符，支持小写字母 a~z、数字、短划线（-）和下划线（_）。
+	Value *string `required:"false"`
+
+	// 头字段内容类型。取值：UserDefined：用户指定。ReferenceHeader：引用用户请求头中的某一个字段。SystemDefined：系统定义。
+	ValueType *string `required:"false"`
+}
+
+/*
+UpdateRuleAttributeParamRuleActions is request schema for complex param
+*/
+type UpdateRuleAttributeParamRuleActions struct {
+
+	//
+	CorsConfig *UpdateRuleAttributeParamRuleActionsCorsConfig `required:"false"`
+
+	//
+	FixedResponseConfig *UpdateRuleAttributeParamRuleActionsFixedResponseConfig `required:"false"`
+
+	//
+	ForwardConfig *UpdateRuleAttributeParamRuleActionsForwardConfig `required:"false"`
+
+	//
+	InsertHeaderConfig *UpdateRuleAttributeParamRuleActionsInsertHeaderConfig `required:"false"`
+
+	// 转发规则动作执行的顺序，取值为1~1000，按值从小到大执行动作。值不能为空，不能重复。Forward、FixedResponse 类型的动作不判断 Order，最后一个执行
+	Order *int `required:"false"`
+
+	//
+	RemoveHeaderConfig *UpdateRuleAttributeParamRuleActionsRemoveHeaderConfig `required:"false"`
+
+	// 动作类型。限定枚举值："Forward"；RuleActions数组长度不为0时必填
+	Type *string `required:"false"`
 }
 
 /*
@@ -3045,18 +3167,6 @@ type UpdateRuleAttributeParamRuleConditions struct {
 	PathConfig *UpdateRuleAttributeParamRuleConditionsPathConfig `required:"false"`
 
 	// 匹配条件类型。限定枚举值："Host"/"Path"；RuleConditions数组长度不为0时必填
-	Type *string `required:"false"`
-}
-
-/*
-UpdateRuleAttributeParamRuleActions is request schema for complex param
-*/
-type UpdateRuleAttributeParamRuleActions struct {
-
-	//
-	ForwardConfig *UpdateRuleAttributeParamRuleActionsForwardConfig `required:"false"`
-
-	// 动作类型。限定枚举值："Forward"；RuleActions数组长度不为0时必填
 	Type *string `required:"false"`
 }
 

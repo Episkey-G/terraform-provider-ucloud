@@ -106,7 +106,9 @@ The following arguments are supported:
 * `duration` - (Optional, ForceNew) The duration that you will buy the instance (Default: `1`). The value is `0` when pay by month and the instance will be valid till the last day of that month. It is not required when `dynamic` (pay by hour).
 * `name` - (Optional) The name of instance, which contains 1-63 characters and only support Chinese, English, numbers, '-', '_', '.'. If not specified, terraform will auto-generate a name beginning with `tf-instance`.
 * `remark` - (Optional) The remarks of instance. (Default: `""`).
-* `security_group` - (Optional) The ID of the associated security group.
+* `security_group` - (Optional) The ID of the associated security group (firewall). Only takes effect when `security_mode` is not set or set to `Firewall`.
+* `security_mode` - (Optional, ForceNew) The security mode of instance. Possible values are: `Firewall` and `SecGroup`. If not set, the instance will use `Firewall` mode by default for backward compatibility.
+* `sec_group_id` - (Optional) A list of security group IDs to bindwith the instance, up to 5. Only takes effect when `security_mode` is `SecGroup`.
 * `vpc_id` - (Optional, ForceNew) The ID of VPC linked to the instance. If not defined `vpc_id`, the instance will use the default VPC in the current region.
 * `subnet_id` - (Optional, ForceNew) The ID of subnet. If defined `vpc_id`, the `subnet_id` is Required. If not defined `vpc_id` and `subnet_id`, the instance will use the default subnet in the current region.
 * `tag` - (Optional) A tag assigned to instance, which contains at most 63 characters and only support Chinese, English, numbers, '-', '_', and '.'. If it is not filled in or a empty string is filled in, then default tag will be assigned. (Default: `Default`).

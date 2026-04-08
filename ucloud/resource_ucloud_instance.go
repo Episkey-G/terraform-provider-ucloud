@@ -13,6 +13,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/validation"
 	"github.com/ucloud/ucloud-sdk-go/services/uhost"
+	"github.com/ucloud/ucloud-sdk-go/services/vpc"
 	"github.com/ucloud/ucloud-sdk-go/ucloud"
 )
 
@@ -245,6 +246,25 @@ func resourceUCloudInstance() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
+			},
+
+			"security_mode": {
+				Type:     schema.TypeString,
+				Optional: true,
+				ForceNew: true,
+				ValidateFunc: validation.StringInSlice([]string{
+					"Firewall",
+					"SecGroup",
+				}, false),
+			},
+
+			"sec_group_id": {
+				Type:     schema.TypeList,
+				Optional: true,
+				MaxItems: 5,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
 			},
 
 			"isolation_group": {
@@ -530,7 +550,17 @@ func resourceUCloudInstanceCreate(d *schema.ResourceData, meta interface{}) erro
 		req.SubnetId = ucloud.String(v.(string))
 	}
 
-	if val, ok := d.GetOk("security_group"); ok {
+	if v, ok := d.GetOk("security_mode"); ok && v.(string) == "SecGroup" {
+		req.SecurityMode = ucloud.String("SecGroup")
+		if sgIds, ok := d.GetOk("sec_group_id"); ok {
+			for i, id := range sgIds.([]interface{}) {
+				req.SecGroupId = append(req.SecGroupId, uhost.CreateUHostInstanceParamSecGroupId{
+					Id:       ucloud.String(id.(string)),
+					Priority: ucloud.Int(i + 1),
+				})
+			}
+		}
+	} else if val, ok := d.GetOk("security_group"); ok {
 		req.SecurityGroupId = ucloud.String(val.(string))
 	}
 
@@ -615,6 +645,51 @@ func resourceUCloudInstanceUpdate(d *schema.ResourceData, meta interface{}) erro
 		}
 
 		d.SetPartial("security_group")
+	}
+
+	if d.HasChange("sec_group_id") && !d.IsNewResource() {
+		vpcConn := client.vpcconn
+
+		// get old sec group bindings
+		oldSecGroups, err := client.describeResourceSecGroup(d.Id())
+		if err != nil {
+			return fmt.Errorf("error on reading sec group bindings for instance %q, %s", d.Id(), err)
+		}
+
+		// disassociate old sec groups
+		if len(oldSecGroups) > 0 {
+			var oldIds []string
+			for _, sg := range oldSecGroups {
+				oldIds = append(oldIds, sg.SecGroupId)
+			}
+			reqDis := vpcConn.NewDisassociateSecGroupRequest()
+			reqDis.ResourceId = []string{d.Id()}
+			reqDis.SecGroupId = oldIds
+			_, err := vpcConn.DisassociateSecGroup(reqDis)
+			if err != nil {
+				return fmt.Errorf("error on %s to instance %q, %s", "DisassociateSecGroup", d.Id(), err)
+			}
+		}
+
+		// associate new sec groups
+		if sgIds, ok := d.GetOk("sec_group_id"); ok {
+			for i, id := range sgIds.([]interface{}) {
+				reqAssoc := vpcConn.NewAssociateSecGroupRequest()
+				reqAssoc.ResourceId = []string{d.Id()}
+				reqAssoc.PrioritySecGroup = []vpc.AssociateSecGroupParamPrioritySecGroup{
+					{
+						SecGroupId: ucloud.String(id.(string)),
+						Priority:   ucloud.Int(i + 1),
+					},
+				}
+				_, err := vpcConn.AssociateSecGroup(reqAssoc)
+				if err != nil {
+					return fmt.Errorf("error on %s to instance %q, %s", "AssociateSecGroup", d.Id(), err)
+				}
+			}
+		}
+
+		d.SetPartial("sec_group_id")
 	}
 
 	if d.HasChange("remark") {
@@ -1014,15 +1089,28 @@ func resourceUCloudInstanceRead(d *schema.ResourceData, meta interface{}) error 
 		return err
 	}
 
-	sgSet, err := client.describeFirewallByIdAndType(d.Id(), eipResourceTypeUHost)
-	if err != nil {
-		if isNotFoundError(err) {
-			return nil
+	// read security mode: sec group or firewall
+	if v, ok := d.GetOk("security_mode"); ok && v.(string) == "SecGroup" {
+		secGroups, err := client.describeResourceSecGroup(d.Id())
+		if err != nil {
+			return fmt.Errorf("error on reading sec group bindings for instance %q, %s", d.Id(), err)
 		}
-		return fmt.Errorf("error on reading security group when reading instance %q, %s", d.Id(), err)
-	}
+		var sgIds []string
+		for _, sg := range secGroups {
+			sgIds = append(sgIds, sg.SecGroupId)
+		}
+		d.Set("sec_group_id", sgIds)
+	} else {
+		sgSet, err := client.describeFirewallByIdAndType(d.Id(), eipResourceTypeUHost)
+		if err != nil {
+			if isNotFoundError(err) {
+				return nil
+			}
+			return fmt.Errorf("error on reading security group when reading instance %q, %s", d.Id(), err)
+		}
 
-	d.Set("security_group", sgSet.FWId)
+		d.Set("security_group", sgSet.FWId)
+	}
 
 	return nil
 }

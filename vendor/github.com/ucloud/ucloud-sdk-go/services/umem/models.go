@@ -28,6 +28,9 @@ type UDRedisSlowlogSet struct {
 	// 分片id
 	BlockId string
 
+	// 慢日志的的客户信息
+	Client string
+
 	// 查询命令
 	Command string
 
@@ -36,6 +39,18 @@ type UDRedisSlowlogSet struct {
 
 	// 查询发生的时间
 	StartTime int
+}
+
+/*
+UMemSpaceAddressSet - DescribeUMemSpace
+*/
+type UMemSpaceAddressSet struct {
+
+	// UMem实例访问IP
+	IP string
+
+	// UMem实例访问Port
+	Port int
 }
 
 /*
@@ -111,18 +126,6 @@ type UMemSlaveDataSet struct {
 
 	// 实例所在可用区，或者master redis所在可用区，参见 [可用区列表](../summary/regionlist.html)
 	Zone string
-}
-
-/*
-UMemSpaceAddressSet - DescribeUMemSpace
-*/
-type UMemSpaceAddressSet struct {
-
-	// UMem实例访问IP
-	IP string
-
-	// UMem实例访问Port
-	Port int
 }
 
 /*
@@ -226,6 +229,9 @@ type UMemBackupSet struct {
 	// 本次备份，分片的数量
 	BlockCount int
 
+	// 备份大小
+	BlockSize int
+
 	// 创建时间
 	CreateTime int
 
@@ -241,8 +247,14 @@ type UMemBlockInfo struct {
 	// 分片id
 	BlockId string
 
+	// 分片名称
+	BlockName string
+
 	// 分片端口
 	BlockPort int
+
+	// 分片读权重
+	BlockReadWeight int
 
 	// 容量单位GB
 	BlockSize int
@@ -253,8 +265,11 @@ type UMemBlockInfo struct {
 	// 分片维护的键槽结束值
 	BlockSlotEnd int
 
-	// 实例状态 Starting // 创建中 Creating // 初始化中 CreateFail // 创建失败 Fail // 创建失败 Deleting // 删除中 DeleteFail // 删除失败 Running // 运行 Resizing // 容量调整中 ResizeFail // 容量调整失败 Configing // 配置中 ConfigFail // 配置失败Restarting // 重启中 SetPasswordFail //设置密码失败
+	// 实例状态 Starting // 创建中 Creating // 初始化中 CreateFail // 创建失败 Fail // 创建失败 Deleting // 删除中 DeleteFail // 删除失败 Running // 运行 Resizing // 容量调整中 ResizeFail // 容量调整失败 Configing // 配置中 ConfigFail // 配置失败Restarting // 重启中 SetPasswordFail //设置密码失败UpgradeMemInit  //任务初始化
 	BlockState string
+
+	// 分片类型，master 或者 slave
+	BlockType string
 
 	// 使用量单位MB
 	BlockUsedSize int
@@ -289,6 +304,9 @@ type UMemSpaceSet struct {
 	// IP端口信息请参见 UMemSpaceAddressSet
 	Address []UMemSpaceAddressSet
 
+	// 实例是否开启了回档
+	AofRollbackEnable bool
+
 	// Year, Month, Dynamic, Trial
 	ChargeType string
 
@@ -316,10 +334,13 @@ type UMemSpaceSet struct {
 	// Starting:创建中 Running:运行中 Fail:失败
 	State string
 
-	//
+	// 子网ID
 	SubnetId string
 
-	//
+	// 实例是否支持回档
+	SupportAofRollback bool
+
+	// 实例tag
 	Tag string
 
 	// 空间类型:single(无热备),double(热备)
@@ -328,7 +349,7 @@ type UMemSpaceSet struct {
 	// 使用量单位MB
 	UsedSize int
 
-	//
+	// VPC ID
 	VPCId string
 
 	// 可用区，参见[可用区列表](../summary/regionlist.html)
@@ -517,13 +538,16 @@ type URedisGroupSet struct {
 	// 组ID
 	GroupId string
 
-	// 组名称
+	// [即将下线,请使用Name] 组名称
 	GroupName string
 
 	// 是否开启高可用,enable,disable
 	HighAvailability string
 
-	// 容量单位GB
+	// 是否是高性能Redis， true表示是； false表示否
+	IsHighPerformance bool
+
+	// [即将下线,请使用Size] 容量单位GB
 	MemorySize int
 
 	// 修改时间 (UNIX时间戳)
@@ -544,13 +568,25 @@ type URedisGroupSet struct {
 	// 实例类型
 	Role string
 
+	// 证书过期时间
+	SSLCertExpireTime int
+
+	// 实例是否开启SSL
+	SSLEnable bool
+
+	// SSL版本
+	SSLVersion string
+
+	// 安全策略。1:内网隔离，2:加密通信，3:内网隔离+加密通信
+	SecPolicy int
+
 	// 容量单位GB
 	Size int
 
 	// 跨机房URedis，slave redis所在可用区，参见 [可用区列表](../summary/regionlist.html)
 	SlaveZone string
 
-	// 状态标记 Creating // 初始化中 CreateFail // 创建失败 Deleting // 删除中 DeleteFail // 删除失败 Running // 运行 Resizing // 容量调整中 ResizeFail // 容量调整失败 Configing // 配置中 ConfigFail // 配置失败
+	// 状态标记 Creating // 初始化中 CreateFail // 创建失败 Deleting // 删除中 DeleteFail // 删除失败 Running // 运行 Resizing // 容量调整中 ResizeFail // 容量调整失败 Configing // 配置中 ConfigFail // 配置失败// 修改SSL中SSLSwitching //SSLSwitchFail修改SSL失败
 	State string
 
 	// subnetid
