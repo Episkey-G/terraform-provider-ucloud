@@ -48,6 +48,23 @@ resource "ucloud_instance" "normal" {
   delete_disks_with_instance = true
 }
 
+# Create instance in SecGroup mode
+resource "ucloud_instance" "secgroup" {
+  availability_zone = "cn-bj2-03"
+  image_id          = data.ucloud_images.normal.images[0].id
+  instance_type     = "n-basic-2"
+  root_password     = "wA1234567"
+  name              = "tf-example-secgroup-instance"
+  tag               = "tf-example"
+  boot_disk_type    = "cloud_ssd"
+
+  security_mode = "SecGroup"
+  sec_group_id {
+    id       = "secgroup-xxxxx"
+    priority = 1
+  }
+}
+
 # Query outstanding image
 data "ucloud_images" "outstanding" {
   availability_zone = "cn-bj2-03"
@@ -108,7 +125,7 @@ The following arguments are supported:
 * `remark` - (Optional) The remarks of instance. (Default: `""`).
 * `security_group` - (Optional) The ID of the associated security group (firewall). Only takes effect when `security_mode` is not set or set to `Firewall`.
 * `security_mode` - (Optional, ForceNew) The security mode of instance. Possible values are: `Firewall` and `SecGroup`. If not set, the instance will use `Firewall` mode by default for backward compatibility.
-* `sec_group_id` - (Optional) A list of security group IDs to bindwith the instance, up to 5. Only takes effect when `security_mode` is `SecGroup`.
+* `sec_group_id` - (Optional) A list of security group bindings, up to 5. Only takes effect when `security_mode` is `SecGroup`. Each item supports `id` (security group ID) and `priority` (binding priority, range: 1-5).
 * `vpc_id` - (Optional, ForceNew) The ID of VPC linked to the instance. If not defined `vpc_id`, the instance will use the default VPC in the current region.
 * `subnet_id` - (Optional, ForceNew) The ID of subnet. If defined `vpc_id`, the `subnet_id` is Required. If not defined `vpc_id` and `subnet_id`, the instance will use the default subnet in the current region.
 * `tag` - (Optional) A tag assigned to instance, which contains at most 63 characters and only support Chinese, English, numbers, '-', '_', and '.'. If it is not filled in or a empty string is filled in, then default tag will be assigned. (Default: `Default`).

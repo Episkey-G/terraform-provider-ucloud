@@ -1,6 +1,8 @@
 package ucloud
 
 import (
+	"fmt"
+
 	"github.com/ucloud/ucloud-sdk-go/services/vpc"
 	"github.com/ucloud/ucloud-sdk-go/ucloud"
 )
@@ -23,6 +25,12 @@ func (c *UCloudClient) describeSecGroupsByVPCId(vpcId string) ([]vpc.SecGroupInf
 		resp, err := conn.DescribeSecGroup(req)
 		if err != nil {
 			return nil, err
+		}
+		if resp != nil && resp.GetRetCode() != 0 {
+			return nil, fmt.Errorf("error on reading sec group list, %s", resp.GetMessage())
+		}
+		if resp == nil {
+			break
 		}
 
 		allSecGroups = append(allSecGroups, resp.DataSet...)
@@ -47,8 +55,10 @@ func (c *UCloudClient) describeResourceSecGroup(resourceId string) ([]vpc.Bindin
 	if err != nil {
 		return nil, err
 	}
-
-	if len(resp.DataSet) < 1 {
+	if resp != nil && resp.GetRetCode() != 0 {
+		return nil, fmt.Errorf("error on reading sec group bindings for resource %q, %s", resourceId, resp.GetMessage())
+	}
+	if resp == nil || len(resp.DataSet) < 1 {
 		return nil, nil
 	}
 

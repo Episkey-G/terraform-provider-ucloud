@@ -3,6 +3,7 @@ package ucloud
 import (
 	"encoding/base64"
 	"fmt"
+	"sort"
 	"strings"
 	"time"
 
@@ -16,6 +17,51 @@ import (
 	"github.com/ucloud/ucloud-sdk-go/services/vpc"
 	"github.com/ucloud/ucloud-sdk-go/ucloud"
 )
+
+type instanceSecGroupBinding struct {
+	ID       string
+	Priority int
+}
+
+func expandInstanceSecGroupBindings(v interface{}) []instanceSecGroupBinding {
+	bindings := make([]instanceSecGroupBinding, 0)
+
+	for _, item := range v.(*schema.Set).List() {
+		binding := item.(map[string]interface{})
+		bindings = append(bindings, instanceSecGroupBinding{
+			ID:       binding["id"].(string),
+			Priority: binding["priority"].(int),
+		})
+	}
+
+	sort.Slice(bindings, func(i, j int) bool {
+		if bindings[i].Priority == bindings[j].Priority {
+			return bindings[i].ID < bindings[j].ID
+		}
+		return bindings[i].Priority < bindings[j].Priority
+	})
+
+	return bindings
+}
+
+func flattenInstanceSecGroupBindings(bindings []vpc.BindingSecGroupInfo) []map[string]interface{} {
+	sort.Slice(bindings, func(i, j int) bool {
+		if bindings[i].Priority == bindings[j].Priority {
+			return bindings[i].SecGroupId < bindings[j].SecGroupId
+		}
+		return bindings[i].Priority < bindings[j].Priority
+	})
+
+	data := make([]map[string]interface{}, 0, len(bindings))
+	for _, binding := range bindings {
+		data = append(data, map[string]interface{}{
+			"id":       binding.SecGroupId,
+			"priority": binding.Priority,
+		})
+	}
+
+	return data
+}
 
 func resourceUCloudInstance() *schema.Resource {
 	return &schema.Resource{
@@ -259,11 +305,21 @@ func resourceUCloudInstance() *schema.Resource {
 			},
 
 			"sec_group_id": {
-				Type:     schema.TypeList,
+				Type:     schema.TypeSet,
 				Optional: true,
 				MaxItems: 5,
-				Elem: &schema.Schema{
-					Type: schema.TypeString,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						"id": {
+							Type:     schema.TypeString,
+							Required: true,
+						},
+						"priority": {
+							Type:         schema.TypeInt,
+							Required:     true,
+							ValidateFunc: validation.IntBetween(1, 5),
+						},
+					},
 				},
 			},
 
@@ -552,11 +608,11 @@ func resourceUCloudInstanceCreate(d *schema.ResourceData, meta interface{}) erro
 
 	if v, ok := d.GetOk("security_mode"); ok && v.(string) == "SecGroup" {
 		req.SecurityMode = ucloud.String("SecGroup")
-		if sgIds, ok := d.GetOk("sec_group_id"); ok {
-			for i, id := range sgIds.([]interface{}) {
+		if bindings, ok := d.GetOk("sec_group_id"); ok {
+			for _, binding := range expandInstanceSecGroupBindings(bindings) {
 				req.SecGroupId = append(req.SecGroupId, uhost.CreateUHostInstanceParamSecGroupId{
-					Id:       ucloud.String(id.(string)),
-					Priority: ucloud.Int(i + 1),
+					Id:       ucloud.String(binding.ID),
+					Priority: ucloud.Int(binding.Priority),
 				})
 			}
 		}
@@ -632,7 +688,9 @@ func resourceUCloudInstanceUpdate(d *schema.ResourceData, meta interface{}) erro
 	conn := client.uhostconn
 	d.Partial(true)
 
-	if d.HasChange("security_group") && !d.IsNewResource() {
+	useSecGroupMode := d.Get("security_mode").(string) == "SecGroup"
+
+	if d.HasChange("security_group") && !d.IsNewResource() && !useSecGroupMode {
 		conn := client.unetconn
 		req := conn.NewGrantFirewallRequest()
 		req.FWId = ucloud.String(d.Get("security_group").(string))
@@ -647,7 +705,7 @@ func resourceUCloudInstanceUpdate(d *schema.ResourceData, meta interface{}) erro
 		d.SetPartial("security_group")
 	}
 
-	if d.HasChange("sec_group_id") && !d.IsNewResource() {
+	if d.HasChange("sec_group_id") && !d.IsNewResource() && useSecGroupMode {
 		vpcConn := client.vpcconn
 
 		// get old sec group bindings
@@ -665,26 +723,32 @@ func resourceUCloudInstanceUpdate(d *schema.ResourceData, meta interface{}) erro
 			reqDis := vpcConn.NewDisassociateSecGroupRequest()
 			reqDis.ResourceId = []string{d.Id()}
 			reqDis.SecGroupId = oldIds
-			_, err := vpcConn.DisassociateSecGroup(reqDis)
+			respDis, err := vpcConn.DisassociateSecGroup(reqDis)
 			if err != nil {
 				return fmt.Errorf("error on %s to instance %q, %s", "DisassociateSecGroup", d.Id(), err)
+			}
+			if respDis != nil && respDis.GetRetCode() != 0 {
+				return fmt.Errorf("error on %s to instance %q, %s", "DisassociateSecGroup", d.Id(), respDis.GetMessage())
 			}
 		}
 
 		// associate new sec groups
-		if sgIds, ok := d.GetOk("sec_group_id"); ok {
-			for i, id := range sgIds.([]interface{}) {
+		if bindings, ok := d.GetOk("sec_group_id"); ok {
+			for _, binding := range expandInstanceSecGroupBindings(bindings) {
 				reqAssoc := vpcConn.NewAssociateSecGroupRequest()
 				reqAssoc.ResourceId = []string{d.Id()}
 				reqAssoc.PrioritySecGroup = []vpc.AssociateSecGroupParamPrioritySecGroup{
 					{
-						SecGroupId: ucloud.String(id.(string)),
-						Priority:   ucloud.Int(i + 1),
+						SecGroupId: ucloud.String(binding.ID),
+						Priority:   ucloud.Int(binding.Priority),
 					},
 				}
-				_, err := vpcConn.AssociateSecGroup(reqAssoc)
+				respAssoc, err := vpcConn.AssociateSecGroup(reqAssoc)
 				if err != nil {
 					return fmt.Errorf("error on %s to instance %q, %s", "AssociateSecGroup", d.Id(), err)
+				}
+				if respAssoc != nil && respAssoc.GetRetCode() != 0 {
+					return fmt.Errorf("error on %s to instance %q, %s", "AssociateSecGroup", d.Id(), respAssoc.GetMessage())
 				}
 			}
 		}
@@ -1095,11 +1159,7 @@ func resourceUCloudInstanceRead(d *schema.ResourceData, meta interface{}) error 
 		if err != nil {
 			return fmt.Errorf("error on reading sec group bindings for instance %q, %s", d.Id(), err)
 		}
-		var sgIds []string
-		for _, sg := range secGroups {
-			sgIds = append(sgIds, sg.SecGroupId)
-		}
-		d.Set("sec_group_id", sgIds)
+		d.Set("sec_group_id", flattenInstanceSecGroupBindings(secGroups))
 	} else {
 		sgSet, err := client.describeFirewallByIdAndType(d.Id(), eipResourceTypeUHost)
 		if err != nil {
