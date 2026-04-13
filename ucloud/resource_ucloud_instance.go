@@ -608,13 +608,15 @@ func resourceUCloudInstanceCreate(d *schema.ResourceData, meta interface{}) erro
 
 	if v, ok := d.GetOk("security_mode"); ok && v.(string) == "SecGroup" {
 		req.SecurityMode = ucloud.String("SecGroup")
-		if bindings, ok := d.GetOk("sec_group_id"); ok {
-			for _, binding := range expandInstanceSecGroupBindings(bindings) {
-				req.SecGroupId = append(req.SecGroupId, uhost.CreateUHostInstanceParamSecGroupId{
-					Id:       ucloud.String(binding.ID),
-					Priority: ucloud.Int(binding.Priority),
-				})
-			}
+		bindings, ok := d.GetOk("sec_group_id")
+		if !ok || len(expandInstanceSecGroupBindings(bindings)) == 0 {
+			return fmt.Errorf("sec_group_id is required when security_mode is set to %q", "SecGroup")
+		}
+		for _, binding := range expandInstanceSecGroupBindings(bindings) {
+			req.SecGroupId = append(req.SecGroupId, uhost.CreateUHostInstanceParamSecGroupId{
+				Id:       ucloud.String(binding.ID),
+				Priority: ucloud.Int(binding.Priority),
+			})
 		}
 	} else if val, ok := d.GetOk("security_group"); ok {
 		req.SecurityGroupId = ucloud.String(val.(string))
@@ -733,23 +735,25 @@ func resourceUCloudInstanceUpdate(d *schema.ResourceData, meta interface{}) erro
 		}
 
 		// associate new sec groups
-		if bindings, ok := d.GetOk("sec_group_id"); ok {
-			for _, binding := range expandInstanceSecGroupBindings(bindings) {
-				reqAssoc := vpcConn.NewAssociateSecGroupRequest()
-				reqAssoc.ResourceId = []string{d.Id()}
-				reqAssoc.PrioritySecGroup = []vpc.AssociateSecGroupParamPrioritySecGroup{
-					{
-						SecGroupId: ucloud.String(binding.ID),
-						Priority:   ucloud.Int(binding.Priority),
-					},
-				}
-				respAssoc, err := vpcConn.AssociateSecGroup(reqAssoc)
-				if err != nil {
-					return fmt.Errorf("error on %s to instance %q, %s", "AssociateSecGroup", d.Id(), err)
-				}
-				if respAssoc != nil && respAssoc.GetRetCode() != 0 {
-					return fmt.Errorf("error on %s to instance %q, %s", "AssociateSecGroup", d.Id(), respAssoc.GetMessage())
-				}
+		bindings, ok := d.GetOk("sec_group_id")
+		if !ok || len(expandInstanceSecGroupBindings(bindings)) == 0 {
+			return fmt.Errorf("sec_group_id cannot be empty when security_mode is %q, at least one security group binding is required", "SecGroup")
+		}
+		for _, binding := range expandInstanceSecGroupBindings(bindings) {
+			reqAssoc := vpcConn.NewAssociateSecGroupRequest()
+			reqAssoc.ResourceId = []string{d.Id()}
+			reqAssoc.PrioritySecGroup = []vpc.AssociateSecGroupParamPrioritySecGroup{
+				{
+					SecGroupId: ucloud.String(binding.ID),
+					Priority:   ucloud.Int(binding.Priority),
+				},
+			}
+			respAssoc, err := vpcConn.AssociateSecGroup(reqAssoc)
+			if err != nil {
+				return fmt.Errorf("error on %s to instance %q, %s", "AssociateSecGroup", d.Id(), err)
+			}
+			if respAssoc != nil && respAssoc.GetRetCode() != 0 {
+				return fmt.Errorf("error on %s to instance %q, %s", "AssociateSecGroup", d.Id(), respAssoc.GetMessage())
 			}
 		}
 
