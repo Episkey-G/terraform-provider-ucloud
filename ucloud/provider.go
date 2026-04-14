@@ -93,6 +93,7 @@ func Provider() terraform.ResourceProvider {
 			"ucloud_disks":                 dataSourceUCloudDisks(),
 			"ucloud_db_instances":          dataSourceUCloudDBInstances(),
 			"ucloud_security_groups":       dataSourceUCloudSecurityGroups(),
+			"ucloud_sec_groups":            dataSourceUCloudSecGroups(),
 			"ucloud_subnets":               dataSourceUCloudSubnets(),
 			"ucloud_lb_ssls":               dataSourceUCloudLBSSLs(),
 			"ucloud_vpcs":                  dataSourceUCloudVPCs(),

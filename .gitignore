@@ -37,3 +37,6 @@ website/vendor
 .vscode/
 .worktrees/
 docs/plans
+.ace-tool/
+CLAUDE.md
+.claude/

@@ -72,10 +72,10 @@ func (c *VPCClient) AddSnatRule(req *AddSnatRuleRequest) (*AddSnatRuleResponse, 
 type AddVPCNetworkRequest struct {
 	request.CommonBase
 
-	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](../summary/get_project_list.html)
+	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
 	// ProjectId *string `required:"false"`
 
-	// [公共参数] 地域。 参见 [地域和可用区列表](../summary/regionlist.html)
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
 	// Region *string `required:"true"`
 
 	// 增加网段
@@ -125,10 +125,10 @@ func (c *VPCClient) AddVPCNetwork(req *AddVPCNetworkRequest) (*AddVPCNetworkResp
 type AddWhiteListResourceRequest struct {
 	request.CommonBase
 
-	// [公共参数] 项目Id。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](../summary/get_project_list.html)
+	// [公共参数] 项目Id。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
 	// ProjectId *string `required:"false"`
 
-	// [公共参数] 地域。 参见 [地域和可用区列表](../summary/regionlist.html)
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
 	// Region *string `required:"true"`
 
 	// NAT网关Id
@@ -249,13 +249,13 @@ func (c *VPCClient) AllocateBatchSecondaryIp(req *AllocateBatchSecondaryIpReques
 type AllocateSecondaryIpRequest struct {
 	request.CommonBase
 
-	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](../summary/get_project_list.html)
+	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
 	// ProjectId *string `required:"true"`
 
-	// [公共参数] 地域。 参见 [地域和可用区列表](../summary/regionlist.html)
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
 	// Region *string `required:"true"`
 
-	// [公共参数] 可用区。参见 [可用区列表](../summary/regionlist.html)
+	// [公共参数] 可用区。参见 [可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
 	// Zone *string `required:"true"`
 
 	// 指定Ip分配
@@ -317,7 +317,7 @@ func (c *VPCClient) AllocateSecondaryIp(req *AllocateSecondaryIpRequest) (*Alloc
 type AllocateVIPRequest struct {
 	request.CommonBase
 
-	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](../summary/get_project_list.html)
+	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
 	// ProjectId *string `required:"false"`
 
 	// [公共参数] 地域
@@ -397,10 +397,10 @@ func (c *VPCClient) AllocateVIP(req *AllocateVIPRequest) (*AllocateVIPResponse, 
 type AssociateRouteTableRequest struct {
 	request.CommonBase
 
-	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](../summary/get_project_list.html)
+	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
 	// ProjectId *string `required:"true"`
 
-	// [公共参数] 地域。 参见 [地域和可用区列表](../summary/regionlist.html)
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
 	// Region *string `required:"true"`
 
 	// 路由表资源ID
@@ -439,6 +439,124 @@ func (c *VPCClient) AssociateRouteTable(req *AssociateRouteTableRequest) (*Assoc
 	reqCopier := *req
 
 	err = c.Client.InvokeAction("AssociateRouteTable", &reqCopier, &res)
+	if err != nil {
+		return &res, err
+	}
+
+	return &res, nil
+}
+
+/*
+AssociateSecGroupParamPrioritySecGroup is request schema for complex param
+*/
+type AssociateSecGroupParamPrioritySecGroup struct {
+
+	// 绑定优先级。该字段和资源 ID 只支持一个批量。支持 PrioritySecGroup 的 JSON 格式数组。
+	Priority *int `required:"true"`
+
+	// 安全组 ID。该字段和资源 ID 只支持一个批量。支持 PrioritySecGroup 的 JSON 格式数组。
+	SecGroupId *string `required:"true"`
+}
+
+// AssociateSecGroupRequest is request schema for AssociateSecGroup action
+type AssociateSecGroupRequest struct {
+	request.CommonBase
+
+	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
+	// ProjectId *string `required:"false"`
+
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
+	// Region *string `required:"true"`
+
+	//
+	PrioritySecGroup []AssociateSecGroupParamPrioritySecGroup `required:"false"`
+
+	// 资源短 ID，安全组参数和该字段只支持一个批量。支持 string 数组。
+	ResourceId []string `required:"true"`
+}
+
+// AssociateSecGroupResponse is response schema for AssociateSecGroup action
+type AssociateSecGroupResponse struct {
+	response.CommonBase
+}
+
+// NewAssociateSecGroupRequest will create request of AssociateSecGroup action.
+func (c *VPCClient) NewAssociateSecGroupRequest() *AssociateSecGroupRequest {
+	req := &AssociateSecGroupRequest{}
+
+	// setup request with client config
+	c.Client.SetupRequest(req)
+
+	// setup retryable with default retry policy (retry for non-create action and common error)
+	req.SetRetryable(true)
+	return req
+}
+
+/*
+API: AssociateSecGroup
+
+绑定资源到安全组
+*/
+func (c *VPCClient) AssociateSecGroup(req *AssociateSecGroupRequest) (*AssociateSecGroupResponse, error) {
+	var err error
+	var res AssociateSecGroupResponse
+
+	reqCopier := *req
+
+	err = c.Client.InvokeAction("AssociateSecGroup", &reqCopier, &res)
+	if err != nil {
+		return &res, err
+	}
+
+	return &res, nil
+}
+
+// AssociateSecGroupDynamicRequest is request schema for AssociateSecGroupDynamic action
+type AssociateSecGroupDynamicRequest struct {
+	request.CommonBase
+
+	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
+	// ProjectId *string `required:"false"`
+
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
+	// Region *string `required:"true"`
+
+	// 资源短 ID 数组。支持数组模式。Type 为 string 数组。
+	ResourceId []string `required:"true"`
+
+	// 安全组ID
+	SecGroupId *string `required:"true"`
+}
+
+// AssociateSecGroupDynamicResponse is response schema for AssociateSecGroupDynamic action
+type AssociateSecGroupDynamicResponse struct {
+	response.CommonBase
+}
+
+// NewAssociateSecGroupDynamicRequest will create request of AssociateSecGroupDynamic action.
+func (c *VPCClient) NewAssociateSecGroupDynamicRequest() *AssociateSecGroupDynamicRequest {
+	req := &AssociateSecGroupDynamicRequest{}
+
+	// setup request with client config
+	c.Client.SetupRequest(req)
+
+	// setup retryable with default retry policy (retry for non-create action and common error)
+	req.SetRetryable(true)
+	return req
+}
+
+/*
+API: AssociateSecGroupDynamic
+
+绑定安全组，动态调整绑定优先级
+*/
+func (c *VPCClient) AssociateSecGroupDynamic(req *AssociateSecGroupDynamicRequest) (*AssociateSecGroupDynamicResponse, error) {
+	var err error
+	var res AssociateSecGroupDynamicResponse
+
+	reqCopier := *req
+
+	err = c.Client.InvokeAction("AssociateSecGroupDynamic", &reqCopier, &res)
 	if err != nil {
 		return &res, err
 	}
@@ -503,10 +621,10 @@ func (c *VPCClient) AttachNetworkInterface(req *AttachNetworkInterfaceRequest) (
 type CloneRouteTableRequest struct {
 	request.CommonBase
 
-	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](../summary/get_project_list.html)
+	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
 	// ProjectId *string `required:"true"`
 
-	// [公共参数] 地域。 参见 [地域和可用区列表](../summary/regionlist.html)
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
 	// Region *string `required:"true"`
 
 	// 被克隆的路由表ID
@@ -630,10 +748,10 @@ func (c *VPCClient) CreateNATGW(req *CreateNATGWRequest) (*CreateNATGWResponse, 
 type CreateNATGWPolicyRequest struct {
 	request.CommonBase
 
-	// [公共参数] 项目Id。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](../summary/get_project_list.html)
+	// [公共参数] 项目Id。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
 	// ProjectId *string `required:"false"`
 
-	// [公共参数] 地域。 参见 [地域和可用区列表](../summary/regionlist.html)
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
 	// Region *string `required:"true"`
 
 	// 目标IP。填写对应的目标IP地址
@@ -701,10 +819,10 @@ func (c *VPCClient) CreateNATGWPolicy(req *CreateNATGWPolicyRequest) (*CreateNAT
 type CreateNetworkAclRequest struct {
 	request.CommonBase
 
-	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](../summary/get_project_list.html)
+	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
 	// ProjectId *string `required:"false"`
 
-	// [公共参数] 地域。 参见 [地域和可用区列表](../summary/regionlist.html)
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
 	// Region *string `required:"true"`
 
 	// ACL的名称
@@ -822,10 +940,10 @@ func (c *VPCClient) CreateNetworkAclAssociation(req *CreateNetworkAclAssociation
 type CreateNetworkAclEntryRequest struct {
 	request.CommonBase
 
-	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](../summary/get_project_list.html)
+	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
 	// ProjectId *string `required:"false"`
 
-	// [公共参数] 地域。 参见 [地域和可用区列表](../summary/regionlist.html)
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
 	// Region *string `required:"true"`
 
 	// ACL的ID
@@ -898,6 +1016,18 @@ func (c *VPCClient) CreateNetworkAclEntry(req *CreateNetworkAclEntryRequest) (*C
 	return &res, nil
 }
 
+/*
+CreateNetworkInterfaceParamPrioritySecGroup is request schema for complex param
+*/
+type CreateNetworkInterfaceParamPrioritySecGroup struct {
+
+	// 安全组优先级
+	Priority *int `required:"false"`
+
+	// 安全组 ID
+	SecGroupId *string `required:"false"`
+}
+
 // CreateNetworkInterfaceRequest is request schema for CreateNetworkInterface action
 type CreateNetworkInterfaceRequest struct {
 	request.CommonBase
@@ -908,8 +1038,17 @@ type CreateNetworkInterfaceRequest struct {
 	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
 	// Region *string `required:"true"`
 
+	// 是否开启EIP直通，默认false
+	EipDirectMode *bool `required:"false"`
+
+	// 枚举值1:EIP网卡可见2:EIP直通默认为1
+	EipDirectVersion *int `required:"false"`
+
 	// 虚拟网卡名称，默认为 NetworkInterface
 	Name *string `required:"false"`
+
+	//
+	PrioritySecGroup []CreateNetworkInterfaceParamPrioritySecGroup `required:"false"`
 
 	// 指定内网IP。当前一个网卡仅支持绑定一个内网IP
 	PrivateIp []string `required:"false"`
@@ -919,6 +1058,9 @@ type CreateNetworkInterfaceRequest struct {
 
 	// 防火墙GroupId，默认：Web推荐防火墙 可由DescribeSecurityGroupResponse中的GroupId取得
 	SecurityGroupId *string `required:"false"`
+
+	// 指定使用 安全组还是防火墙。为 0 时绑定防火墙，为1时绑定安全组
+	SecurityMode *int `required:"false"`
 
 	// 所属子网ID
 	SubnetId *string `required:"true"`
@@ -973,10 +1115,10 @@ func (c *VPCClient) CreateNetworkInterface(req *CreateNetworkInterfaceRequest) (
 type CreateRouteTableRequest struct {
 	request.CommonBase
 
-	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](../summary/get_project_list.html)
+	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
 	// ProjectId *string `required:"true"`
 
-	// [公共参数] 地域。 参见 [地域和可用区列表](../summary/regionlist.html)
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
 	// Region *string `required:"true"`
 
 	// 路由表名称。默认为RouteTable
@@ -1024,6 +1166,146 @@ func (c *VPCClient) CreateRouteTable(req *CreateRouteTableRequest) (*CreateRoute
 	reqCopier := *req
 
 	err = c.Client.InvokeAction("CreateRouteTable", &reqCopier, &res)
+	if err != nil {
+		return &res, err
+	}
+
+	return &res, nil
+}
+
+// CreateSecGroupRequest is request schema for CreateSecGroup action
+type CreateSecGroupRequest struct {
+	request.CommonBase
+
+	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
+	// ProjectId *string `required:"false"`
+
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
+	// Region *string `required:"true"`
+
+	// 安全组名称，最长64个字符。
+	Name *string `required:"true"`
+
+	// 资源ID所属的VPC
+	VPCID *string `required:"true"`
+}
+
+// CreateSecGroupResponse is response schema for CreateSecGroup action
+type CreateSecGroupResponse struct {
+	response.CommonBase
+
+	// 安全组ID
+	SecGroupId string
+}
+
+// NewCreateSecGroupRequest will create request of CreateSecGroup action.
+func (c *VPCClient) NewCreateSecGroupRequest() *CreateSecGroupRequest {
+	req := &CreateSecGroupRequest{}
+
+	// setup request with client config
+	c.Client.SetupRequest(req)
+
+	// setup retryable with default retry policy (retry for non-create action and common error)
+	req.SetRetryable(false)
+	return req
+}
+
+/*
+API: CreateSecGroup
+
+创建安全组
+*/
+func (c *VPCClient) CreateSecGroup(req *CreateSecGroupRequest) (*CreateSecGroupResponse, error) {
+	var err error
+	var res CreateSecGroupResponse
+
+	reqCopier := *req
+
+	err = c.Client.InvokeAction("CreateSecGroup", &reqCopier, &res)
+	if err != nil {
+		return &res, err
+	}
+
+	return &res, nil
+}
+
+/*
+CreateSecGroupRuleParamRule is request schema for complex param
+*/
+type CreateSecGroupRuleParamRule struct {
+
+	// "Ingress/Egress"，入站规则/出站规则
+	Direction *string `required:"true"`
+
+	// 目的端口。逗号分隔，如 "80,443"、"443,2000-10000"
+	DstPort *string `required:"true"`
+
+	// IP 地址信息，逗号分隔。
+	IPRange *string `required:"true"`
+
+	// IP 版本，如 “IPv4”。支持 IPv6 后废弃
+	IPVersion *string `required:"false"`
+
+	// 规则优先级。范围为 1~200
+	Priority *int `required:"true"`
+
+	// 协议类型。"TCP","UDP","ICMP","ICMPv6","ALL"
+	ProtocolType *string `required:"true"`
+
+	// 规则备注
+	Remark *string `required:"true"`
+
+	// 规则行为。"Accept" 或 "Drop"
+	RuleAction *string `required:"true"`
+}
+
+// CreateSecGroupRuleRequest is request schema for CreateSecGroupRule action
+type CreateSecGroupRuleRequest struct {
+	request.CommonBase
+
+	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
+	// ProjectId *string `required:"false"`
+
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
+	// Region *string `required:"true"`
+
+	//
+	Rule []CreateSecGroupRuleParamRule `required:"false"`
+
+	// 需要添加规则的安全组资源ID。
+	SecGroupId *string `required:"true"`
+}
+
+// CreateSecGroupRuleResponse is response schema for CreateSecGroupRule action
+type CreateSecGroupRuleResponse struct {
+	response.CommonBase
+
+	// 规则 ID
+	RuleId []string
+}
+
+// NewCreateSecGroupRuleRequest will create request of CreateSecGroupRule action.
+func (c *VPCClient) NewCreateSecGroupRuleRequest() *CreateSecGroupRuleRequest {
+	req := &CreateSecGroupRuleRequest{}
+
+	// setup request with client config
+	c.Client.SetupRequest(req)
+
+	// setup retryable with default retry policy (retry for non-create action and common error)
+	req.SetRetryable(false)
+	return req
+}
+
+/*
+API: CreateSecGroupRule
+*/
+func (c *VPCClient) CreateSecGroupRule(req *CreateSecGroupRuleRequest) (*CreateSecGroupRuleResponse, error) {
+	var err error
+	var res CreateSecGroupRuleResponse
+
+	reqCopier := *req
+
+	err = c.Client.InvokeAction("CreateSecGroupRule", &reqCopier, &res)
 	if err != nil {
 		return &res, err
 	}
@@ -1091,11 +1373,17 @@ func (c *VPCClient) CreateSnatDnatRule(req *CreateSnatDnatRuleRequest) (*CreateS
 type CreateSubnetRequest struct {
 	request.CommonBase
 
-	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](../summary/get_project_list.html)
+	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
 	// ProjectId *string `required:"false"`
 
-	// [公共参数] 地域。 参见 [地域和可用区列表](../summary/regionlist.html)
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
 	// Region *string `required:"true"`
+
+	// 是否关联IPv6
+	AssociateIPv6 *bool `required:"false"`
+
+	// IPv6网段
+	IPv6Network *string `required:"false"`
 
 	// 子网网络号位数，默认为24
 	Netmask *int `required:"false"`
@@ -1112,6 +1400,9 @@ type CreateSubnetRequest struct {
 	// 业务组名称，默认为Default
 	Tag *string `required:"false"`
 
+	// 所属VPC的IPv6网段，可选，不填默认从VPC IPv6网段中选择一个进行分配
+	VPCIPv6Network *string `required:"false"`
+
 	// VPC资源ID
 	VPCId *string `required:"true"`
 }
@@ -1119,6 +1410,9 @@ type CreateSubnetRequest struct {
 // CreateSubnetResponse is response schema for CreateSubnet action
 type CreateSubnetResponse struct {
 	response.CommonBase
+
+	// IPv6网段
+	IPv6Network string
 
 	// 子网ID
 	SubnetId string
@@ -1159,17 +1453,23 @@ func (c *VPCClient) CreateSubnet(req *CreateSubnetRequest) (*CreateSubnetRespons
 type CreateVPCRequest struct {
 	request.CommonBase
 
-	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](../summary/get_project_list.html)
+	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
 	// ProjectId *string `required:"false"`
 
-	// [公共参数] 地域。 参见 [地域和可用区列表](../summary/regionlist.html)
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
 	// Region *string `required:"true"`
+
+	// 是否关联IPv6
+	AssociateIPv6 *bool `required:"false"`
 
 	// VPC名称
 	Name *string `required:"true"`
 
 	// VPC网段
 	Network []string `required:"true"`
+
+	// IPv6网段类型
+	OperatorName *string `required:"false"`
 
 	// 备注
 	Remark *string `required:"false"`
@@ -1224,10 +1524,10 @@ func (c *VPCClient) CreateVPC(req *CreateVPCRequest) (*CreateVPCResponse, error)
 type CreateVPCIntercomRequest struct {
 	request.CommonBase
 
-	// [公共参数] 源VPC所在项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](../summary/get_project_list.html)
+	// [公共参数] 源VPC所在项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
 	// ProjectId *string `required:"false"`
 
-	// [公共参数] 源VPC所在地域。 参见 [地域和可用区列表](../summary/regionlist.html)
+	// [公共参数] 源VPC所在地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
 	// Region *string `required:"true"`
 
 	// 目的VPC项目ID。默认与源VPC同项目。
@@ -1336,10 +1636,10 @@ func (c *VPCClient) DeleteNATGW(req *DeleteNATGWRequest) (*DeleteNATGWResponse, 
 type DeleteNATGWPolicyRequest struct {
 	request.CommonBase
 
-	// [公共参数] 项目Id。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](../summary/get_project_list.html)
+	// [公共参数] 项目Id。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
 	// ProjectId *string `required:"false"`
 
-	// [公共参数] 地域。 参见 [地域和可用区列表](../summary/regionlist.html)
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
 	// Region *string `required:"true"`
 
 	// NAT网关Id
@@ -1389,10 +1689,10 @@ func (c *VPCClient) DeleteNATGWPolicy(req *DeleteNATGWPolicyRequest) (*DeleteNAT
 type DeleteNetworkAclRequest struct {
 	request.CommonBase
 
-	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](../summary/get_project_list.html)
+	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
 	// ProjectId *string `required:"false"`
 
-	// [公共参数] 地域。 参见 [地域和可用区列表](../summary/regionlist.html)
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
 	// Region *string `required:"true"`
 
 	// 需要删除的AclId
@@ -1439,10 +1739,10 @@ func (c *VPCClient) DeleteNetworkAcl(req *DeleteNetworkAclRequest) (*DeleteNetwo
 type DeleteNetworkAclAssociationRequest struct {
 	request.CommonBase
 
-	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](../summary/get_project_list.html)
+	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
 	// ProjectId *string `required:"false"`
 
-	// [公共参数] 地域。 参见 [地域和可用区列表](../summary/regionlist.html)
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
 	// Region *string `required:"true"`
 
 	// 需要删除的AclId
@@ -1492,10 +1792,10 @@ func (c *VPCClient) DeleteNetworkAclAssociation(req *DeleteNetworkAclAssociation
 type DeleteNetworkAclEntryRequest struct {
 	request.CommonBase
 
-	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](../summary/get_project_list.html)
+	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
 	// ProjectId *string `required:"false"`
 
-	// [公共参数] 地域。 参见 [地域和可用区列表](../summary/regionlist.html)
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
 	// Region *string `required:"true"`
 
 	// Acl的ID
@@ -1595,10 +1895,10 @@ func (c *VPCClient) DeleteNetworkInterface(req *DeleteNetworkInterfaceRequest) (
 type DeleteRouteTableRequest struct {
 	request.CommonBase
 
-	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](../summary/get_project_list.html)
+	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
 	// ProjectId *string `required:"true"`
 
-	// [公共参数] 地域。 参见 [地域和可用区列表](../summary/regionlist.html)
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
 	// Region *string `required:"true"`
 
 	// 路由表资源ID
@@ -1641,17 +1941,118 @@ func (c *VPCClient) DeleteRouteTable(req *DeleteRouteTableRequest) (*DeleteRoute
 	return &res, nil
 }
 
+// DeleteSecGroupRequest is request schema for DeleteSecGroup action
+type DeleteSecGroupRequest struct {
+	request.CommonBase
+
+	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
+	// ProjectId *string `required:"false"`
+
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
+	// Region *string `required:"true"`
+
+	// 安全组资源 Id。支持 string 数组格式。
+	SecGroupId []string `required:"true"`
+}
+
+// DeleteSecGroupResponse is response schema for DeleteSecGroup action
+type DeleteSecGroupResponse struct {
+	response.CommonBase
+}
+
+// NewDeleteSecGroupRequest will create request of DeleteSecGroup action.
+func (c *VPCClient) NewDeleteSecGroupRequest() *DeleteSecGroupRequest {
+	req := &DeleteSecGroupRequest{}
+
+	// setup request with client config
+	c.Client.SetupRequest(req)
+
+	// setup retryable with default retry policy (retry for non-create action and common error)
+	req.SetRetryable(true)
+	return req
+}
+
+/*
+API: DeleteSecGroup
+
+删除安全组
+*/
+func (c *VPCClient) DeleteSecGroup(req *DeleteSecGroupRequest) (*DeleteSecGroupResponse, error) {
+	var err error
+	var res DeleteSecGroupResponse
+
+	reqCopier := *req
+
+	err = c.Client.InvokeAction("DeleteSecGroup", &reqCopier, &res)
+	if err != nil {
+		return &res, err
+	}
+
+	return &res, nil
+}
+
+// DeleteSecGroupRuleRequest is request schema for DeleteSecGroupRule action
+type DeleteSecGroupRuleRequest struct {
+	request.CommonBase
+
+	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
+	// ProjectId *string `required:"false"`
+
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
+	// Region *string `required:"true"`
+
+	// 安全组规则 ID。支持 string 数组格式。
+	RuleId []string `required:"true"`
+
+	// 所属安全组 ID。
+	SecGroupId *string `required:"true"`
+}
+
+// DeleteSecGroupRuleResponse is response schema for DeleteSecGroupRule action
+type DeleteSecGroupRuleResponse struct {
+	response.CommonBase
+}
+
+// NewDeleteSecGroupRuleRequest will create request of DeleteSecGroupRule action.
+func (c *VPCClient) NewDeleteSecGroupRuleRequest() *DeleteSecGroupRuleRequest {
+	req := &DeleteSecGroupRuleRequest{}
+
+	// setup request with client config
+	c.Client.SetupRequest(req)
+
+	// setup retryable with default retry policy (retry for non-create action and common error)
+	req.SetRetryable(true)
+	return req
+}
+
+/*
+API: DeleteSecGroupRule
+*/
+func (c *VPCClient) DeleteSecGroupRule(req *DeleteSecGroupRuleRequest) (*DeleteSecGroupRuleResponse, error) {
+	var err error
+	var res DeleteSecGroupRuleResponse
+
+	reqCopier := *req
+
+	err = c.Client.InvokeAction("DeleteSecGroupRule", &reqCopier, &res)
+	if err != nil {
+		return &res, err
+	}
+
+	return &res, nil
+}
+
 // DeleteSecondaryIpRequest is request schema for DeleteSecondaryIp action
 type DeleteSecondaryIpRequest struct {
 	request.CommonBase
 
-	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](../summary/get_project_list.html)
+	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
 	// ProjectId *string `required:"true"`
 
-	// [公共参数] 地域。 参见 [地域和可用区列表](../summary/regionlist.html)
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
 	// Region *string `required:"true"`
 
-	// [公共参数] 可用区。参见 [可用区列表](../summary/regionlist.html)
+	// [公共参数] 可用区。参见 [可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
 	// Zone *string `required:"true"`
 
 	// ip
@@ -1819,10 +2220,10 @@ func (c *VPCClient) DeleteSnatRule(req *DeleteSnatRuleRequest) (*DeleteSnatRuleR
 type DeleteSubnetRequest struct {
 	request.CommonBase
 
-	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](../summary/get_project_list.html)
+	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
 	// ProjectId *string `required:"false"`
 
-	// [公共参数] 地域。 参见 [地域和可用区列表](../summary/regionlist.html)
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
 	// Region *string `required:"true"`
 
 	// 子网ID
@@ -1869,10 +2270,10 @@ func (c *VPCClient) DeleteSubnet(req *DeleteSubnetRequest) (*DeleteSubnetRespons
 type DeleteVPCRequest struct {
 	request.CommonBase
 
-	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](../summary/get_project_list.html)
+	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
 	// ProjectId *string `required:"false"`
 
-	// [公共参数] 地域。 参见 [地域和可用区列表](../summary/regionlist.html)
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
 	// Region *string `required:"true"`
 
 	// VPC资源Id
@@ -1919,10 +2320,10 @@ func (c *VPCClient) DeleteVPC(req *DeleteVPCRequest) (*DeleteVPCResponse, error)
 type DeleteVPCIntercomRequest struct {
 	request.CommonBase
 
-	// [公共参数] 源VPC所在项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](../summary/get_project_list.html)
+	// [公共参数] 源VPC所在项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
 	// ProjectId *string `required:"false"`
 
-	// [公共参数] 源VPC所在地域。 参见 [地域和可用区列表](../summary/regionlist.html)
+	// [公共参数] 源VPC所在地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
 	// Region *string `required:"true"`
 
 	// 目的VPC所在项目ID，默认为源VPC所在项目ID
@@ -1978,10 +2379,10 @@ func (c *VPCClient) DeleteVPCIntercom(req *DeleteVPCIntercomRequest) (*DeleteVPC
 type DeleteWhiteListResourceRequest struct {
 	request.CommonBase
 
-	// [公共参数] 项目Id。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](../summary/get_project_list.html)
+	// [公共参数] 项目Id。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
 	// ProjectId *string `required:"false"`
 
-	// [公共参数] 地域。 参见 [地域和可用区列表](../summary/regionlist.html)
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
 	// Region *string `required:"true"`
 
 	// NAT网关Id
@@ -2152,10 +2553,10 @@ func (c *VPCClient) DescribeNATGW(req *DescribeNATGWRequest) (*DescribeNATGWResp
 type DescribeNATGWPolicyRequest struct {
 	request.CommonBase
 
-	// [公共参数] 项目Id。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](../summary/get_project_list.html)
+	// [公共参数] 项目Id。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
 	// ProjectId *string `required:"false"`
 
-	// [公共参数] 地域。 参见 [地域和可用区列表](../summary/regionlist.html)
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
 	// Region *string `required:"true"`
 
 	// 返回数据长度，默认为10000
@@ -2273,10 +2674,10 @@ func (c *VPCClient) DescribeNetworkAcl(req *DescribeNetworkAclRequest) (*Describ
 type DescribeNetworkAclAssociationRequest struct {
 	request.CommonBase
 
-	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](../summary/get_project_list.html)
+	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
 	// ProjectId *string `required:"false"`
 
-	// [公共参数] 地域。 参见 [地域和可用区列表](../summary/regionlist.html)
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
 	// Region *string `required:"true"`
 
 	// Acl的ID
@@ -2332,10 +2733,10 @@ func (c *VPCClient) DescribeNetworkAclAssociation(req *DescribeNetworkAclAssocia
 type DescribeNetworkAclAssociationBySubnetRequest struct {
 	request.CommonBase
 
-	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](../summary/get_project_list.html)
+	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
 	// ProjectId *string `required:"false"`
 
-	// [公共参数] 地域。 参见 [地域和可用区列表](../summary/regionlist.html)
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
 	// Region *string `required:"true"`
 
 	// 子网的ID
@@ -2511,6 +2912,74 @@ func (c *VPCClient) DescribeNetworkInterface(req *DescribeNetworkInterfaceReques
 	return &res, nil
 }
 
+// DescribeResourceSecGroupRequest is request schema for DescribeResourceSecGroup action
+type DescribeResourceSecGroupRequest struct {
+	request.CommonBase
+
+	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
+	// ProjectId *string `required:"false"`
+
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
+	// Region *string `required:"true"`
+
+	// 分页查询时的最大返回资源数量。
+	Limit *int `required:"false"`
+
+	// 分页查询时的偏移量。传入了 ResourceId 则不分页。
+	Offset *int `required:"false"`
+
+	// 资源 ID 数组，如果指定则不分页；否则分页获取该账号下的指定类型的资源。支持  string 数组格式。
+	ResourceId []string `required:"false"`
+
+	// 资源类型，如 uhost, uni
+	ResourceType *string `required:"false"`
+
+	// VPC ID。非必须，分页使用（分页时，也可不传）；ResourceId 非空时，忽略
+	VPCId *string `required:"false"`
+}
+
+// DescribeResourceSecGroupResponse is response schema for DescribeResourceSecGroup action
+type DescribeResourceSecGroupResponse struct {
+	response.CommonBase
+
+	// 资源绑定的安全组信息
+	DataSet []ResourceSecgroupInfoEx
+
+	// 资源总数量。传入 ResourceId 时，为传入资源中的有效资源数量。
+	TotalCount int
+}
+
+// NewDescribeResourceSecGroupRequest will create request of DescribeResourceSecGroup action.
+func (c *VPCClient) NewDescribeResourceSecGroupRequest() *DescribeResourceSecGroupRequest {
+	req := &DescribeResourceSecGroupRequest{}
+
+	// setup request with client config
+	c.Client.SetupRequest(req)
+
+	// setup retryable with default retry policy (retry for non-create action and common error)
+	req.SetRetryable(true)
+	return req
+}
+
+/*
+API: DescribeResourceSecGroup
+
+查询资源绑定的安全组信息
+*/
+func (c *VPCClient) DescribeResourceSecGroup(req *DescribeResourceSecGroupRequest) (*DescribeResourceSecGroupResponse, error) {
+	var err error
+	var res DescribeResourceSecGroupResponse
+
+	reqCopier := *req
+
+	err = c.Client.InvokeAction("DescribeResourceSecGroup", &reqCopier, &res)
+	if err != nil {
+		return &res, err
+	}
+
+	return &res, nil
+}
+
 // DescribeRouteTableRequest is request schema for DescribeRouteTable action
 type DescribeRouteTableRequest struct {
 	request.CommonBase
@@ -2578,6 +3047,128 @@ func (c *VPCClient) DescribeRouteTable(req *DescribeRouteTableRequest) (*Describ
 	reqCopier := *req
 
 	err = c.Client.InvokeAction("DescribeRouteTable", &reqCopier, &res)
+	if err != nil {
+		return &res, err
+	}
+
+	return &res, nil
+}
+
+// DescribeSecGroupRequest is request schema for DescribeSecGroup action
+type DescribeSecGroupRequest struct {
+	request.CommonBase
+
+	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
+	// ProjectId *string `required:"false"`
+
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
+	// Region *string `required:"true"`
+
+	// 分页查询数据长度。默认为20
+	Limit *int `required:"false"`
+
+	// 分页查询起始位置偏移量。默认为0
+	Offset *int `required:"false"`
+
+	// 安全组资源 ID 数组，传入则 Offset/Limit/BusinessId 失效。支持数组格式。Type 为 string 数组。
+	SecGroupId []string `required:"false"`
+
+	// 资源ID所属的 VPC ID
+	VPCId *string `required:"false"`
+}
+
+// DescribeSecGroupResponse is response schema for DescribeSecGroup action
+type DescribeSecGroupResponse struct {
+	response.CommonBase
+
+	// 详见SecGroupInfo
+	DataSet []SecGroupInfo
+}
+
+// NewDescribeSecGroupRequest will create request of DescribeSecGroup action.
+func (c *VPCClient) NewDescribeSecGroupRequest() *DescribeSecGroupRequest {
+	req := &DescribeSecGroupRequest{}
+
+	// setup request with client config
+	c.Client.SetupRequest(req)
+
+	// setup retryable with default retry policy (retry for non-create action and common error)
+	req.SetRetryable(true)
+	return req
+}
+
+/*
+API: DescribeSecGroup
+*/
+func (c *VPCClient) DescribeSecGroup(req *DescribeSecGroupRequest) (*DescribeSecGroupResponse, error) {
+	var err error
+	var res DescribeSecGroupResponse
+
+	reqCopier := *req
+
+	err = c.Client.InvokeAction("DescribeSecGroup", &reqCopier, &res)
+	if err != nil {
+		return &res, err
+	}
+
+	return &res, nil
+}
+
+// DescribeSecGroupResourceRequest is request schema for DescribeSecGroupResource action
+type DescribeSecGroupResourceRequest struct {
+	request.CommonBase
+
+	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
+	// ProjectId *string `required:"false"`
+
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
+	// Region *string `required:"true"`
+
+	// 分页查询长度。默认为20
+	Limit *int `required:"false"`
+
+	// 分页查询起始位置偏移量。默认为0
+	Offset *int `required:"false"`
+
+	// 安全组资源ID。
+	SecGroupId *string `required:"false"`
+}
+
+// DescribeSecGroupResourceResponse is response schema for DescribeSecGroupResource action
+type DescribeSecGroupResourceResponse struct {
+	response.CommonBase
+
+	// 详见SecGroupResourceInfo
+	DataSet []SecGroupResourceInfo
+
+	// 安全组绑定的资源总数
+	TotalCount int
+}
+
+// NewDescribeSecGroupResourceRequest will create request of DescribeSecGroupResource action.
+func (c *VPCClient) NewDescribeSecGroupResourceRequest() *DescribeSecGroupResourceRequest {
+	req := &DescribeSecGroupResourceRequest{}
+
+	// setup request with client config
+	c.Client.SetupRequest(req)
+
+	// setup retryable with default retry policy (retry for non-create action and common error)
+	req.SetRetryable(true)
+	return req
+}
+
+/*
+API: DescribeSecGroupResource
+
+获取安全组绑资源信息
+*/
+func (c *VPCClient) DescribeSecGroupResource(req *DescribeSecGroupResourceRequest) (*DescribeSecGroupResourceResponse, error) {
+	var err error
+	var res DescribeSecGroupResourceResponse
+
+	reqCopier := *req
+
+	err = c.Client.InvokeAction("DescribeSecGroupResource", &reqCopier, &res)
 	if err != nil {
 		return &res, err
 	}
@@ -2778,14 +3369,17 @@ func (c *VPCClient) DescribeSnatRule(req *DescribeSnatRuleRequest) (*DescribeSna
 type DescribeSubnetRequest struct {
 	request.CommonBase
 
-	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](../summary/get_project_list.html)
+	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
 	// ProjectId *string `required:"false"`
 
-	// [公共参数] 地域。 参见 [地域和可用区列表](../summary/regionlist.html)
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
 	// Region *string `required:"true"`
 
 	// 【该字段已废弃，请谨慎使用】
 	BusinessId *string `required:"false" deprecated:"true"`
+
+	// 默认为 false针对控制台调用，可设置为true，不进行控制台非必要数据的查询
+	IgnoreResource *bool `required:"false"`
 
 	// 列表长度，默认为20
 	Limit *int `required:"false"`
@@ -2858,10 +3452,10 @@ func (c *VPCClient) DescribeSubnet(req *DescribeSubnetRequest) (*DescribeSubnetR
 type DescribeSubnetResourceRequest struct {
 	request.CommonBase
 
-	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](../summary/get_project_list.html)
+	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
 	// ProjectId *string `required:"false"`
 
-	// [公共参数] 地域。 参见 [地域和可用区列表](../summary/regionlist.html)
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
 	// Region *string `required:"true"`
 
 	// 单页返回数据长度，默认为20
@@ -2923,13 +3517,13 @@ func (c *VPCClient) DescribeSubnetResource(req *DescribeSubnetResourceRequest) (
 type DescribeVIPRequest struct {
 	request.CommonBase
 
-	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](../summary/get_project_list.html)
+	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
 	// ProjectId *string `required:"true"`
 
-	// [公共参数] 地域。 参见 [地域和可用区列表](../summary/regionlist.html)
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
 	// Region *string `required:"true"`
 
-	// [公共参数] 可用区。参见 [可用区列表](../summary/regionlist.html)
+	// [公共参数] 可用区。参见 [可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
 	// Zone *string `required:"false"`
 
 	// 业务组
@@ -3127,14 +3721,8 @@ type DescribeWhiteListResourceRequest struct {
 	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
 	// Region *string `required:"true"`
 
-	// 数据分页值, 默认为20
-	Limit *int `required:"false"`
-
 	// NAT网关的Id
 	NATGWIds []string `required:"true"`
-
-	// 数据偏移量, 默认为0
-	Offset *int `required:"false"`
 }
 
 // DescribeWhiteListResourceResponse is response schema for DescribeWhiteListResource action
@@ -3232,14 +3820,191 @@ func (c *VPCClient) DetachNetworkInterface(req *DetachNetworkInterfaceRequest) (
 	return &res, nil
 }
 
+// DisableUniEipDirectModeRequest is request schema for DisableUniEipDirectMode action
+type DisableUniEipDirectModeRequest struct {
+	request.CommonBase
+
+	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
+	// ProjectId *string `required:"true"`
+
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
+	// Region *string `required:"true"`
+
+	// [公共参数] 可用区。参见 [可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
+	// Zone *string `required:"false"`
+
+	// 虚拟网卡ID
+	InterfaceId *string `required:"true"`
+
+	// VPC ID
+	VPCId *string `required:"true"`
+}
+
+// DisableUniEipDirectModeResponse is response schema for DisableUniEipDirectMode action
+type DisableUniEipDirectModeResponse struct {
+	response.CommonBase
+
+	// 返回信息
+	Message string
+}
+
+// NewDisableUniEipDirectModeRequest will create request of DisableUniEipDirectMode action.
+func (c *VPCClient) NewDisableUniEipDirectModeRequest() *DisableUniEipDirectModeRequest {
+	req := &DisableUniEipDirectModeRequest{}
+
+	// setup request with client config
+	c.Client.SetupRequest(req)
+
+	// setup retryable with default retry policy (retry for non-create action and common error)
+	req.SetRetryable(true)
+	return req
+}
+
+/*
+API: DisableUniEipDirectMode
+
+关闭虚拟网卡EIP直通功能
+*/
+func (c *VPCClient) DisableUniEipDirectMode(req *DisableUniEipDirectModeRequest) (*DisableUniEipDirectModeResponse, error) {
+	var err error
+	var res DisableUniEipDirectModeResponse
+
+	reqCopier := *req
+
+	err = c.Client.InvokeAction("DisableUniEipDirectMode", &reqCopier, &res)
+	if err != nil {
+		return &res, err
+	}
+
+	return &res, nil
+}
+
+// DisassociateSecGroupRequest is request schema for DisassociateSecGroup action
+type DisassociateSecGroupRequest struct {
+	request.CommonBase
+
+	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
+	// ProjectId *string `required:"false"`
+
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
+	// Region *string `required:"true"`
+
+	// 是否强制解绑。默认为 false。为 true 表示强制解绑，用于删除资源前的解绑，因为开启安全组特性的资源至少绑定一个安全组，正常情况下是不允许解绑所有安全组。
+	Force *bool `required:"false"`
+
+	// 资源ID，不传表示解绑资源上所有安全组，安全组ID和资源ID至少传一个，且只能有一个批量。支持 string 数组格式。
+	ResourceId []string `required:"false"`
+
+	// 安全组ID，不传表示解绑安全组绑定的所以资源，安全组ID和资源ID至少传一个,且只能有一个批量。支持 string 数组格式。
+	SecGroupId []string `required:"false"`
+}
+
+// DisassociateSecGroupResponse is response schema for DisassociateSecGroup action
+type DisassociateSecGroupResponse struct {
+	response.CommonBase
+}
+
+// NewDisassociateSecGroupRequest will create request of DisassociateSecGroup action.
+func (c *VPCClient) NewDisassociateSecGroupRequest() *DisassociateSecGroupRequest {
+	req := &DisassociateSecGroupRequest{}
+
+	// setup request with client config
+	c.Client.SetupRequest(req)
+
+	// setup retryable with default retry policy (retry for non-create action and common error)
+	req.SetRetryable(true)
+	return req
+}
+
+/*
+API: DisassociateSecGroup
+
+解绑安全组和资源绑定关系
+*/
+func (c *VPCClient) DisassociateSecGroup(req *DisassociateSecGroupRequest) (*DisassociateSecGroupResponse, error) {
+	var err error
+	var res DisassociateSecGroupResponse
+
+	reqCopier := *req
+
+	err = c.Client.InvokeAction("DisassociateSecGroup", &reqCopier, &res)
+	if err != nil {
+		return &res, err
+	}
+
+	return &res, nil
+}
+
+// EnableUniEipDirectModeRequest is request schema for EnableUniEipDirectMode action
+type EnableUniEipDirectModeRequest struct {
+	request.CommonBase
+
+	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
+	// ProjectId *string `required:"true"`
+
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
+	// Region *string `required:"true"`
+
+	// [公共参数] 可用区。参见 [可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
+	// Zone *string `required:"false"`
+
+	// 枚举值：1-EIP网卡可见2-EIP直通默认为1
+	EipDirectVersion *int `required:"false"`
+
+	// 虚拟网卡ID
+	InterfaceId *string `required:"true"`
+
+	// VPC ID
+	VPCId *string `required:"true"`
+}
+
+// EnableUniEipDirectModeResponse is response schema for EnableUniEipDirectMode action
+type EnableUniEipDirectModeResponse struct {
+	response.CommonBase
+
+	// 返回信息
+	Message string
+}
+
+// NewEnableUniEipDirectModeRequest will create request of EnableUniEipDirectMode action.
+func (c *VPCClient) NewEnableUniEipDirectModeRequest() *EnableUniEipDirectModeRequest {
+	req := &EnableUniEipDirectModeRequest{}
+
+	// setup request with client config
+	c.Client.SetupRequest(req)
+
+	// setup retryable with default retry policy (retry for non-create action and common error)
+	req.SetRetryable(true)
+	return req
+}
+
+/*
+API: EnableUniEipDirectMode
+
+开启虚拟网卡EIP直通功能
+*/
+func (c *VPCClient) EnableUniEipDirectMode(req *EnableUniEipDirectModeRequest) (*EnableUniEipDirectModeResponse, error) {
+	var err error
+	var res EnableUniEipDirectModeResponse
+
+	reqCopier := *req
+
+	err = c.Client.InvokeAction("EnableUniEipDirectMode", &reqCopier, &res)
+	if err != nil {
+		return &res, err
+	}
+
+	return &res, nil
+}
+
 // EnableWhiteListRequest is request schema for EnableWhiteList action
 type EnableWhiteListRequest struct {
 	request.CommonBase
 
-	// [公共参数] 项目Id。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](../summary/get_project_list.html)
+	// [公共参数] 项目Id。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
 	// ProjectId *string `required:"false"`
 
-	// [公共参数] 地域。 参见 [地域和可用区列表](../summary/regionlist.html)
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
 	// Region *string `required:"true"`
 
 	// 白名单开关标记。0：关闭；1：开启。默认为0
@@ -3311,6 +4076,9 @@ type GetAvailableResourceForPolicyResponse struct {
 
 	// 支持资源类型的信息
 	DataSet []GetAvailableResourceForPolicyDataSet
+
+	// 可配置端口转发规则的资源总数
+	TotalCount int
 }
 
 // NewGetAvailableResourceForPolicyRequest will create request of GetAvailableResourceForPolicy action.
@@ -3368,14 +4136,8 @@ type GetAvailableResourceForSnatRuleRequest struct {
 type GetAvailableResourceForSnatRuleResponse struct {
 	response.CommonBase
 
-	// 操作名称
-	Action string
-
 	// 返回的资源详细信息
 	DataSet []GetAvailableResourceForSnatRuleDataSet
-
-	// 返回值
-	RetCode string
 
 	// 总数
 	TotalCount int
@@ -3534,10 +4296,10 @@ func (c *VPCClient) GetNetworkAclTargetResource(req *GetNetworkAclTargetResource
 type ListSubnetForNATGWRequest struct {
 	request.CommonBase
 
-	// [公共参数] 项目Id。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](../summary/get_project_list.html)
+	// [公共参数] 项目Id。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
 	// ProjectId *string `required:"false"`
 
-	// [公共参数] 地域。 参见 [地域和可用区列表](../summary/regionlist.html)
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
 	// Region *string `required:"true"`
 
 	// NAT网关所属VPC Id。默认值为Default VPC Id
@@ -3587,10 +4349,10 @@ func (c *VPCClient) ListSubnetForNATGW(req *ListSubnetForNATGWRequest) (*ListSub
 type ModifyRouteRuleRequest struct {
 	request.CommonBase
 
-	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](../summary/get_project_list.html)
+	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
 	// ProjectId *string `required:"true"`
 
-	// [公共参数] 地域。 参见 [地域和可用区列表](../summary/regionlist.html)
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
 	// Region *string `required:"true"`
 
 	// 格式: RouteRuleId | 目的网段 | 下一跳类型（支持INSTANCE、VIP） | 下一跳 |优先级（保留字段，填写0即可）| 备注 | 增、删、改标志（add/delete/update） 。"添加"示例: test_id | 10.8.0.0/16 | instance | uhost-xd8ja | 0 | Default Route Rule| add (添加的RouteRuleId填任意非空字符串) 。"删除"示例: routerule-xk3jxa | 10.8.0.0/16 | instance | uhost-xd8ja | 0 | Default Route Rule| delete (RouteRuleId来自DescribeRouteTable中)     。“修改”示例: routerule-xk3jxa | 10.8.0.0/16 | instance | uhost-cjksa2 | 0 | Default Route Rule| update (RouteRuleId来自DescribeRouteTable中)
@@ -3752,10 +4514,10 @@ func (c *VPCClient) ReleaseVIP(req *ReleaseVIPRequest) (*ReleaseVIPResponse, err
 type SetGwDefaultExportRequest struct {
 	request.CommonBase
 
-	// [公共参数] 项目Id。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](../summary/get_project_list.html)
+	// [公共参数] 项目Id。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
 	// ProjectId *string `required:"false"`
 
-	// [公共参数] 地域。 参见 [地域和可用区列表](../summary/regionlist.html)
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
 	// Region *string `required:"true"`
 
 	// NAT网关绑定的EIP Id。ExportIp和ExportEipId必填一个
@@ -3797,6 +4559,183 @@ func (c *VPCClient) SetGwDefaultExport(req *SetGwDefaultExportRequest) (*SetGwDe
 	reqCopier := *req
 
 	err = c.Client.InvokeAction("SetGwDefaultExport", &reqCopier, &res)
+	if err != nil {
+		return &res, err
+	}
+
+	return &res, nil
+}
+
+// SwitchToFirewallRequest is request schema for SwitchToFirewall action
+type SwitchToFirewallRequest struct {
+	request.CommonBase
+
+	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
+	// ProjectId *string `required:"true"`
+
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
+	// Region *string `required:"true"`
+
+	// 防火墙 ID
+	Firewall *string `required:"false"`
+
+	// map[string]string，string 到 防火墙 ID 的映射。ResourceId是uhost则Node是uni；ResourceId是uhadoop则Node是hadoophost
+	NodeToFirewall *string `required:"false"`
+
+	// 资源ID。资源类型为 UHost、UNI、PAAS 资源
+	ResourceId *string `required:"true"`
+}
+
+// SwitchToFirewallResponse is response schema for SwitchToFirewall action
+type SwitchToFirewallResponse struct {
+	response.CommonBase
+}
+
+// NewSwitchToFirewallRequest will create request of SwitchToFirewall action.
+func (c *VPCClient) NewSwitchToFirewallRequest() *SwitchToFirewallRequest {
+	req := &SwitchToFirewallRequest{}
+
+	// setup request with client config
+	c.Client.SetupRequest(req)
+
+	// setup retryable with default retry policy (retry for non-create action and common error)
+	req.SetRetryable(true)
+	return req
+}
+
+/*
+API: SwitchToFirewall
+
+切换至防火墙模式
+*/
+func (c *VPCClient) SwitchToFirewall(req *SwitchToFirewallRequest) (*SwitchToFirewallResponse, error) {
+	var err error
+	var res SwitchToFirewallResponse
+
+	reqCopier := *req
+
+	err = c.Client.InvokeAction("SwitchToFirewall", &reqCopier, &res)
+	if err != nil {
+		return &res, err
+	}
+
+	return &res, nil
+}
+
+// SwitchToSecGroupRequest is request schema for SwitchToSecGroup action
+type SwitchToSecGroupRequest struct {
+	request.CommonBase
+
+	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
+	// ProjectId *string `required:"true"`
+
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
+	// Region *string `required:"true"`
+
+	// 是否移除当前的防火墙（且绑定默认全通的防火墙）
+	IsRemoveFirewall *bool `required:"true"`
+
+	// PrioritySecGroup类型的数组
+	PrioritySecGroup []string `required:"false"`
+
+	// 资源ID。资源类型为 UHost、UNI、PAAS 资源
+	ResourceId *string `required:"true"`
+
+	// map[string][]PrioritySecGroup， string 到 PrioritySecGroup 数组的映射
+	UniToPrioritySecGroup *string `required:"false"`
+}
+
+// SwitchToSecGroupResponse is response schema for SwitchToSecGroup action
+type SwitchToSecGroupResponse struct {
+	response.CommonBase
+
+	// 错误信息
+	Message string
+}
+
+// NewSwitchToSecGroupRequest will create request of SwitchToSecGroup action.
+func (c *VPCClient) NewSwitchToSecGroupRequest() *SwitchToSecGroupRequest {
+	req := &SwitchToSecGroupRequest{}
+
+	// setup request with client config
+	c.Client.SetupRequest(req)
+
+	// setup retryable with default retry policy (retry for non-create action and common error)
+	req.SetRetryable(true)
+	return req
+}
+
+/*
+API: SwitchToSecGroup
+
+切换至安全组模式
+*/
+func (c *VPCClient) SwitchToSecGroup(req *SwitchToSecGroupRequest) (*SwitchToSecGroupResponse, error) {
+	var err error
+	var res SwitchToSecGroupResponse
+
+	reqCopier := *req
+
+	err = c.Client.InvokeAction("SwitchToSecGroup", &reqCopier, &res)
+	if err != nil {
+		return &res, err
+	}
+
+	return &res, nil
+}
+
+// UpdateNATGWRequest is request schema for UpdateNATGW action
+type UpdateNATGWRequest struct {
+	request.CommonBase
+
+	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
+	// ProjectId *string `required:"false"`
+
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
+	// Region *string `required:"true"`
+
+	// natgw id
+	NATGWId *string `required:"true"`
+
+	// NATGateWay 名字
+	NATGWName *string `required:"false"`
+
+	// 备注
+	Remark *string `required:"false"`
+
+	// 业务组
+	Tag *string `required:"false"`
+}
+
+// UpdateNATGWResponse is response schema for UpdateNATGW action
+type UpdateNATGWResponse struct {
+	response.CommonBase
+}
+
+// NewUpdateNATGWRequest will create request of UpdateNATGW action.
+func (c *VPCClient) NewUpdateNATGWRequest() *UpdateNATGWRequest {
+	req := &UpdateNATGWRequest{}
+
+	// setup request with client config
+	c.Client.SetupRequest(req)
+
+	// setup retryable with default retry policy (retry for non-create action and common error)
+	req.SetRetryable(true)
+	return req
+}
+
+/*
+API: UpdateNATGW
+
+更新nat网关基本信息
+*/
+func (c *VPCClient) UpdateNATGW(req *UpdateNATGWRequest) (*UpdateNATGWResponse, error) {
+	var err error
+	var res UpdateNATGWResponse
+
+	reqCopier := *req
+
+	err = c.Client.InvokeAction("UpdateNATGW", &reqCopier, &res)
 	if err != nil {
 		return &res, err
 	}
@@ -3875,6 +4814,59 @@ func (c *VPCClient) UpdateNATGWPolicy(req *UpdateNATGWPolicyRequest) (*UpdateNAT
 	return &res, nil
 }
 
+// UpdateNATGWSnatpoolRequest is request schema for UpdateNATGWSnatpool action
+type UpdateNATGWSnatpoolRequest struct {
+	request.CommonBase
+
+	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
+	// ProjectId *string `required:"false"`
+
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
+	// Region *string `required:"true"`
+
+	// 开启，"enable"；关闭，"disable"；
+	IsSnatpoolEnabled *string `required:"true"`
+
+	// NAT网关的资源ID
+	NATGWId *string `required:"true"`
+}
+
+// UpdateNATGWSnatpoolResponse is response schema for UpdateNATGWSnatpool action
+type UpdateNATGWSnatpoolResponse struct {
+	response.CommonBase
+}
+
+// NewUpdateNATGWSnatpoolRequest will create request of UpdateNATGWSnatpool action.
+func (c *VPCClient) NewUpdateNATGWSnatpoolRequest() *UpdateNATGWSnatpoolRequest {
+	req := &UpdateNATGWSnatpoolRequest{}
+
+	// setup request with client config
+	c.Client.SetupRequest(req)
+
+	// setup retryable with default retry policy (retry for non-create action and common error)
+	req.SetRetryable(true)
+	return req
+}
+
+/*
+API: UpdateNATGWSnatpool
+
+NAT网关默认出口规则是否开启Snatpool，若开启，对应控制台上的负载均衡流量出口方式。
+*/
+func (c *VPCClient) UpdateNATGWSnatpool(req *UpdateNATGWSnatpoolRequest) (*UpdateNATGWSnatpoolResponse, error) {
+	var err error
+	var res UpdateNATGWSnatpoolResponse
+
+	reqCopier := *req
+
+	err = c.Client.InvokeAction("UpdateNATGWSnatpool", &reqCopier, &res)
+	if err != nil {
+		return &res, err
+	}
+
+	return &res, nil
+}
+
 // UpdateNATGWSubnetRequest is request schema for UpdateNATGWSubnet action
 type UpdateNATGWSubnetRequest struct {
 	request.CommonBase
@@ -3932,10 +4924,10 @@ func (c *VPCClient) UpdateNATGWSubnet(req *UpdateNATGWSubnetRequest) (*UpdateNAT
 type UpdateNetworkAclRequest struct {
 	request.CommonBase
 
-	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](../summary/get_project_list.html)
+	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
 	// ProjectId *string `required:"false"`
 
-	// [公共参数] 地域。 参见 [地域和可用区列表](../summary/regionlist.html)
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
 	// Region *string `required:"true"`
 
 	// 需要更改的ACL ID
@@ -3988,10 +4980,10 @@ func (c *VPCClient) UpdateNetworkAcl(req *UpdateNetworkAclRequest) (*UpdateNetwo
 type UpdateNetworkAclEntryRequest struct {
 	request.CommonBase
 
-	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](../summary/get_project_list.html)
+	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
 	// ProjectId *string `required:"false"`
 
-	// [公共参数] 地域。 参见 [地域和可用区列表](../summary/regionlist.html)
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
 	// Region *string `required:"true"`
 
 	// ACL的ID
@@ -4064,14 +5056,73 @@ func (c *VPCClient) UpdateNetworkAclEntry(req *UpdateNetworkAclEntryRequest) (*U
 	return &res, nil
 }
 
+// UpdateNetworkInterfaceDefaultOutputRequest is request schema for UpdateNetworkInterfaceDefaultOutput action
+type UpdateNetworkInterfaceDefaultOutputRequest struct {
+	request.CommonBase
+
+	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
+	// ProjectId *string `required:"false"`
+
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
+	// Region *string `required:"true"`
+
+	// [公共参数] 可用区。参见 [可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
+	// Zone *string `required:"true"`
+
+	// 虚拟网卡Id
+	InterfaceId *string `required:"true"`
+
+	// 出口IP
+	Output *string `required:"false"`
+}
+
+// UpdateNetworkInterfaceDefaultOutputResponse is response schema for UpdateNetworkInterfaceDefaultOutput action
+type UpdateNetworkInterfaceDefaultOutputResponse struct {
+	response.CommonBase
+
+	// 返回信息
+	Message string
+}
+
+// NewUpdateNetworkInterfaceDefaultOutputRequest will create request of UpdateNetworkInterfaceDefaultOutput action.
+func (c *VPCClient) NewUpdateNetworkInterfaceDefaultOutputRequest() *UpdateNetworkInterfaceDefaultOutputRequest {
+	req := &UpdateNetworkInterfaceDefaultOutputRequest{}
+
+	// setup request with client config
+	c.Client.SetupRequest(req)
+
+	// setup retryable with default retry policy (retry for non-create action and common error)
+	req.SetRetryable(true)
+	return req
+}
+
+/*
+API: UpdateNetworkInterfaceDefaultOutput
+
+更新虚拟网卡默认出口(仅用于开启EIP网卡可见模式的虚拟网卡)
+*/
+func (c *VPCClient) UpdateNetworkInterfaceDefaultOutput(req *UpdateNetworkInterfaceDefaultOutputRequest) (*UpdateNetworkInterfaceDefaultOutputResponse, error) {
+	var err error
+	var res UpdateNetworkInterfaceDefaultOutputResponse
+
+	reqCopier := *req
+
+	err = c.Client.InvokeAction("UpdateNetworkInterfaceDefaultOutput", &reqCopier, &res)
+	if err != nil {
+		return &res, err
+	}
+
+	return &res, nil
+}
+
 // UpdateRouteTableAttributeRequest is request schema for UpdateRouteTableAttribute action
 type UpdateRouteTableAttributeRequest struct {
 	request.CommonBase
 
-	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](../summary/get_project_list.html)
+	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
 	// ProjectId *string `required:"true"`
 
-	// [公共参数] 地域。 参见 [地域和可用区列表](../summary/regionlist.html)
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
 	// Region *string `required:"true"`
 
 	// 名称
@@ -4116,6 +5167,214 @@ func (c *VPCClient) UpdateRouteTableAttribute(req *UpdateRouteTableAttributeRequ
 	reqCopier := *req
 
 	err = c.Client.InvokeAction("UpdateRouteTableAttribute", &reqCopier, &res)
+	if err != nil {
+		return &res, err
+	}
+
+	return &res, nil
+}
+
+// UpdateSecGroupRequest is request schema for UpdateSecGroup action
+type UpdateSecGroupRequest struct {
+	request.CommonBase
+
+	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
+	// ProjectId *string `required:"false"`
+
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
+	// Region *string `required:"true"`
+
+	// 安全组名称，默认为空，为空则不做修改。Name,Tag,Remark必须填写1个及以上
+	Name *string `required:"false"`
+
+	// 安全组备注，默认为空，为空则不做修改。Name,Tag,Remark必须填写1个及以上
+	Remark *string `required:"false"`
+
+	// 安全组资源ID数组。不支持 .n 格式。Type 为 string 数组。
+	SecGroupId *string `required:"true"`
+}
+
+// UpdateSecGroupResponse is response schema for UpdateSecGroup action
+type UpdateSecGroupResponse struct {
+	response.CommonBase
+}
+
+// NewUpdateSecGroupRequest will create request of UpdateSecGroup action.
+func (c *VPCClient) NewUpdateSecGroupRequest() *UpdateSecGroupRequest {
+	req := &UpdateSecGroupRequest{}
+
+	// setup request with client config
+	c.Client.SetupRequest(req)
+
+	// setup retryable with default retry policy (retry for non-create action and common error)
+	req.SetRetryable(true)
+	return req
+}
+
+/*
+API: UpdateSecGroup
+
+更新安全组基本信息
+*/
+func (c *VPCClient) UpdateSecGroup(req *UpdateSecGroupRequest) (*UpdateSecGroupResponse, error) {
+	var err error
+	var res UpdateSecGroupResponse
+
+	reqCopier := *req
+
+	err = c.Client.InvokeAction("UpdateSecGroup", &reqCopier, &res)
+	if err != nil {
+		return &res, err
+	}
+
+	return &res, nil
+}
+
+/*
+UpdateSecGroupAssociationParamNewPrioritySecGroup is request schema for complex param
+*/
+type UpdateSecGroupAssociationParamNewPrioritySecGroup struct {
+
+	// 新绑定安全组的绑定优先级。支持 NewPrioritySecGroup 为数组格式，即传对应数据的 JSON 格式数组。
+	Priority *int `required:"true"`
+
+	// 需新绑定的安全组ID
+	SecGroupId *string `required:"true"`
+}
+
+// UpdateSecGroupAssociationRequest is request schema for UpdateSecGroupAssociation action
+type UpdateSecGroupAssociationRequest struct {
+	request.CommonBase
+
+	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
+	// ProjectId *string `required:"false"`
+
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
+	// Region *string `required:"true"`
+
+	//
+	NewPrioritySecGroup []UpdateSecGroupAssociationParamNewPrioritySecGroup `required:"false"`
+
+	// 被替换的安全组ID。支持数组格式，即为 string 数组。
+	OldSecGroupId []string `required:"true"`
+
+	// 资源ID
+	ResourceId *string `required:"true"`
+}
+
+// UpdateSecGroupAssociationResponse is response schema for UpdateSecGroupAssociation action
+type UpdateSecGroupAssociationResponse struct {
+	response.CommonBase
+}
+
+// NewUpdateSecGroupAssociationRequest will create request of UpdateSecGroupAssociation action.
+func (c *VPCClient) NewUpdateSecGroupAssociationRequest() *UpdateSecGroupAssociationRequest {
+	req := &UpdateSecGroupAssociationRequest{}
+
+	// setup request with client config
+	c.Client.SetupRequest(req)
+
+	// setup retryable with default retry policy (retry for non-create action and common error)
+	req.SetRetryable(true)
+	return req
+}
+
+/*
+API: UpdateSecGroupAssociation
+
+仅对操作的安全组ID生效，其他已有的绑定关系不受影响。
+*/
+func (c *VPCClient) UpdateSecGroupAssociation(req *UpdateSecGroupAssociationRequest) (*UpdateSecGroupAssociationResponse, error) {
+	var err error
+	var res UpdateSecGroupAssociationResponse
+
+	reqCopier := *req
+
+	err = c.Client.InvokeAction("UpdateSecGroupAssociation", &reqCopier, &res)
+	if err != nil {
+		return &res, err
+	}
+
+	return &res, nil
+}
+
+/*
+UpdateSecGroupRuleParamRule is request schema for complex param
+*/
+type UpdateSecGroupRuleParamRule struct {
+
+	// "Ingress/Egress"，入站规则/出站规则
+	Direction *string `required:"true"`
+
+	// 目的端口。逗号分隔，如 "80,443"、"443,2000-10000"
+	DstPort *string `required:"true"`
+
+	// IP 地址信息，逗号分隔。
+	IPRange *string `required:"true"`
+
+	// IP 版本，如 “IPv4”。支持 IPv6 后废弃
+	IPVersion *string `required:"false"`
+
+	// 规则优先级。范围为 1~200
+	Priority *int `required:"true"`
+
+	// 协议类型。"TCP","UDP","ICMP","ICMPv6","ALL"
+	ProtocolType *string `required:"true"`
+
+	// 规则备注
+	Remark *string `required:"true"`
+
+	// 规则行为。"Accept" 或 "Drop"
+	RuleAction *string `required:"true"`
+
+	// 规则 ID
+	RuleId *string `required:"true"`
+}
+
+// UpdateSecGroupRuleRequest is request schema for UpdateSecGroupRule action
+type UpdateSecGroupRuleRequest struct {
+	request.CommonBase
+
+	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
+	// ProjectId *string `required:"false"`
+
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
+	// Region *string `required:"true"`
+
+	//
+	Rule []UpdateSecGroupRuleParamRule `required:"false"`
+
+	// 规则所属得安全组 ID。
+	SecGroupId *string `required:"true"`
+}
+
+// UpdateSecGroupRuleResponse is response schema for UpdateSecGroupRule action
+type UpdateSecGroupRuleResponse struct {
+	response.CommonBase
+}
+
+// NewUpdateSecGroupRuleRequest will create request of UpdateSecGroupRule action.
+func (c *VPCClient) NewUpdateSecGroupRuleRequest() *UpdateSecGroupRuleRequest {
+	req := &UpdateSecGroupRuleRequest{}
+
+	// setup request with client config
+	c.Client.SetupRequest(req)
+
+	// setup retryable with default retry policy (retry for non-create action and common error)
+	req.SetRetryable(true)
+	return req
+}
+
+/*
+API: UpdateSecGroupRule
+*/
+func (c *VPCClient) UpdateSecGroupRule(req *UpdateSecGroupRuleRequest) (*UpdateSecGroupRuleResponse, error) {
+	var err error
+	var res UpdateSecGroupRuleResponse
+
+	reqCopier := *req
+
+	err = c.Client.InvokeAction("UpdateSecGroupRule", &reqCopier, &res)
 	if err != nil {
 		return &res, err
 	}
@@ -4186,10 +5445,10 @@ func (c *VPCClient) UpdateSnatRule(req *UpdateSnatRuleRequest) (*UpdateSnatRuleR
 type UpdateSubnetAttributeRequest struct {
 	request.CommonBase
 
-	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](../summary/get_project_list.html)
+	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
 	// ProjectId *string `required:"false"`
 
-	// [公共参数] 地域。 参见 [地域和可用区列表](../summary/regionlist.html)
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
 	// Region *string `required:"true"`
 
 	// 子网名称(如果Name不填写，Tag必须填写)
@@ -4242,10 +5501,10 @@ func (c *VPCClient) UpdateSubnetAttribute(req *UpdateSubnetAttributeRequest) (*U
 type UpdateVIPAttributeRequest struct {
 	request.CommonBase
 
-	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](../summary/get_project_list.html)
+	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
 	// ProjectId *string `required:"true"`
 
-	// [公共参数] 地域。 参见 [地域和可用区列表](../summary/regionlist.html)
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
 	// Region *string `required:"true"`
 
 	// 内网VIP的名称
@@ -4301,10 +5560,10 @@ func (c *VPCClient) UpdateVIPAttribute(req *UpdateVIPAttributeRequest) (*UpdateV
 type UpdateVPCNetworkRequest struct {
 	request.CommonBase
 
-	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](../summary/get_project_list.html)
+	// [公共参数] 项目ID。不填写为默认项目，子帐号必须填写。 请参考[GetProjectList接口](https://docs.ucloud.cn/api/summary/get_project_list)
 	// ProjectId *string `required:"true"`
 
-	// [公共参数] 地域。 参见 [地域和可用区列表](../summary/regionlist.html)
+	// [公共参数] 地域。 参见 [地域和可用区列表](https://docs.ucloud.cn/api/summary/regionlist)
 	// Region *string `required:"true"`
 
 	// 需要保留的VPC网段。当前仅支持删除VPC网段，添加网段请参考[AddVPCNetwork](https://docs.ucloud.cn/api/vpc2.0-api/add_vpc_network)

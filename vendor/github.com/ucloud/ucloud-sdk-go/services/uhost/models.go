@@ -3,6 +3,21 @@
 package uhost
 
 /*
+CopyImageTaskInfo - 镜像复制的任务信息
+*/
+type CopyImageTaskInfo struct {
+
+	// 目标镜像Id
+	TargetImageId string
+
+	// 目标地域
+	TargetRegion string
+
+	// 目标镜像复制的任务Id
+	TaskId string
+}
+
+/*
 KeyPair - 密钥对信息
 */
 type KeyPair struct {
@@ -24,6 +39,21 @@ type KeyPair struct {
 
 	// 项目ID。
 	ProjectId string
+}
+
+/*
+Collection - CPU和内存可支持的规格
+*/
+type Collection struct {
+
+	// CPU规格
+	Cpu int
+
+	// 内存规格
+	Memory []int
+
+	// CPU和内存规格只能在列出来的CPU平台支持
+	MinimalCpuPlatform []string
 }
 
 /*
@@ -78,30 +108,27 @@ type BootDiskInfo struct {
 }
 
 /*
-Collection - CPU和内存可支持的规格
+Performance - GPU的性能指标
 */
-type Collection struct {
-
-	// CPU规格
-	Cpu int
-
-	// 内存规格
-	Memory []int
-
-	// CPU和内存规格只能在列出来的CPU平台支持
-	MinimalCpuPlatform []string
-}
-
-/*
-GraphicsMemory - GPU的显存指标
-*/
-type GraphicsMemory struct {
+type Performance struct {
 
 	// 交互展示参数，可忽略
 	Rate int
 
-	// 值，单位是GB
-	Value int
+	// 值，单位是TFlops
+	Value float64
+}
+
+/*
+MachineSizes - GPU、CPU和内存信息
+*/
+type MachineSizes struct {
+
+	// CPU和内存可支持的规格
+	Collection []Collection
+
+	// Gpu为GPU可支持的规格即GPU颗数，非GPU机型，Gpu为0
+	Gpu int
 }
 
 /*
@@ -132,6 +159,18 @@ type Disks struct {
 }
 
 /*
+GraphicsMemory - GPU的显存指标
+*/
+type GraphicsMemory struct {
+
+	// 交互展示参数，可忽略
+	Rate int
+
+	// 值，单位是GB
+	Value int
+}
+
+/*
 CpuPlatforms - CPU平台信息
 */
 type CpuPlatforms struct {
@@ -144,30 +183,6 @@ type CpuPlatforms struct {
 
 	// 返回Intel的CPU平台信息，例如：Intel: ['Intel/CascadeLake','Intel/CascadelakeR','Intel/IceLake']
 	Intel []string
-}
-
-/*
-Performance - GPU的性能指标
-*/
-type Performance struct {
-
-	// 交互展示参数，可忽略
-	Rate int
-
-	// 值，单位是TFlops
-	Value float64
-}
-
-/*
-MachineSizes - GPU、CPU和内存信息
-*/
-type MachineSizes struct {
-
-	// CPU和内存可支持的规格
-	Collection []Collection
-
-	// Gpu为GPU可支持的规格即GPU颗数，非GPU机型，Gpu为0
-	Gpu int
 }
 
 /*
@@ -207,6 +222,21 @@ type AvailableInstanceTypes struct {
 }
 
 /*
+BasePriceSet - 价格信息
+*/
+type BasePriceSet struct {
+
+	// 计费类型
+	ChargeType string
+
+	// 限时优惠的折前原价（即列表价乘以商务折扣后的单价）。
+	OriginalPrice float64
+
+	// 价格，单位: 元，保留小数点后两位有效数字
+	Price float64
+}
+
+/*
 UHostImageSet - DescribeImage
 */
 type UHostImageSet struct {
@@ -214,10 +244,13 @@ type UHostImageSet struct {
 	// 创建时间，格式为Unix时间戳
 	CreateTime int
 
+	// 关联的云盘数据盘快照Id列表
+	DataSnapshotIds []string
+
 	// 特殊状态标识，目前包含NetEnhnced（网络增强1.0）, NetEnhanced_Ultra（网络增强2.0）, NetEnhanced_Extreme（网络增强3.0）, HotPlug(热升级), GPU（GPU镜像）,CloudInit, IPv6（支持IPv6网络）,RssdAttachable（支持RSSD云盘）,Vgpu_AMD（支持AMD的vgpu）,Vgpu_NVIDIA（支持NVIDIA的vgpu）,Aarch64_Type（支持arm64架构）
 	Features []string
 
-	// 行业镜像类型（仅行业镜像将返回这个值）
+	// 镜像归属,枚举值:["gpu","app","uhost"]。"gpu": 对gpu进行处理过的行业镜像；"app"：轻量云主机专用的镜像；"uhost"：云主机镜像市场的行业镜像
 	FuncType string
 
 	// 镜像描述
@@ -241,6 +274,9 @@ type UHostImageSet struct {
 	// 介绍链接（仅行业镜像将返回这个值）
 	Links string
 
+	// 系统EOL的时间，格式：YYYY/MM/DD
+	MaintainEol string
+
 	// 默认值为空'''。当CentOS 7.3/7.4/7.5等镜像会标记为“Broadwell”
 	MinimalCPU string
 
@@ -249,6 +285,9 @@ type UHostImageSet struct {
 
 	// 操作系统类型：Linux，Windows
 	OsType string
+
+	// 镜像的价格信息
+	PriceSet []BasePriceSet
 
 	// 主要安装软件
 	PrimarySoftware string
@@ -261,6 +300,9 @@ type UHostImageSet struct {
 
 	// 支持的GPU机型
 	SupportedGPUTypes []string
+
+	// 业务组
+	Tag string
 
 	// 供应商（仅行业镜像将返回这个值）
 	Vendor string
@@ -300,75 +342,6 @@ type IsolationGroup struct {
 }
 
 /*
-SpotAttribute - 竞价实例属性
-*/
-type SpotAttribute struct {
-
-	// 回收时间
-	RecycleTime int
-}
-
-/*
-UDSetUDHostAttribute - 私有专区对应的宿主机属性
-*/
-type UDSetUDHostAttribute struct {
-
-	// 是否绑定私有专区宿主机
-	HostBinding bool
-
-	// 私有专区宿主机
-	UDHostId string
-
-	// 私有专区
-	UDSetId string
-}
-
-/*
-UHostDiskSet - DescribeUHostInstance
-*/
-type UHostDiskSet struct {
-
-	// 备份方案。若开通了数据方舟，则为DATAARK
-	BackupType string
-
-	// 磁盘ID
-	DiskId string
-
-	// 磁盘类型。请参考[[api:uhost-api:disk_type|磁盘类型]]。
-	DiskType string
-
-	// 磁盘盘符
-	Drive string
-
-	// "true": 加密盘 "false"：非加密盘
-	Encrypted string
-
-	// 是否是系统盘。枚举值：\\ > True，是系统盘 \\ > False，是数据盘（默认）。Disks数组中有且只能有一块盘是系统盘。
-	IsBoot string
-
-	// UDisk名字（仅当磁盘是UDisk时返回）
-	Name string
-
-	// 磁盘大小，单位: GB
-	Size int
-
-	// 【建议不再使用】磁盘类型。系统盘: Boot，数据盘: Data,网络盘：Udisk
-	Type string
-}
-
-/*
-UHostKeyPair - 主机密钥信息
-*/
-type UHostKeyPair struct {
-
-	// 密钥对ID
-	KeyPairId string
-
-	// 主机密钥对状态，Normal 正常，Deleted 删除
-	KeyPairState string
-}
-
-/*
 UHostIPSet - DescribeUHostInstance
 */
 type UHostIPSet struct {
@@ -405,6 +378,75 @@ type UHostIPSet struct {
 
 	// 当前EIP的权重。权重最大的为当前的出口IP。
 	Weight int
+}
+
+/*
+SpotAttribute - 竞价实例属性
+*/
+type SpotAttribute struct {
+
+	// 回收时间
+	RecycleTime int
+}
+
+/*
+UHostDiskSet - DescribeUHostInstance
+*/
+type UHostDiskSet struct {
+
+	// 备份方案。若开通了数据方舟，则为DATAARK
+	BackupType string
+
+	// 磁盘ID
+	DiskId string
+
+	// 磁盘类型。请参考[[api:uhost-api:disk_type|磁盘类型]]。
+	DiskType string
+
+	// 磁盘盘符
+	Drive string
+
+	// "true": 加密盘 "false"：非加密盘
+	Encrypted string
+
+	// 是否是系统盘。枚举值：\\ > True，是系统盘 \\ > False，是数据盘（默认）。Disks数组中有且只能有一块盘是系统盘。
+	IsBoot string
+
+	// UDisk名字（仅当磁盘是UDisk时返回）
+	Name string
+
+	// 磁盘大小，单位: GB
+	Size int
+
+	// 【建议不再使用】磁盘类型。系统盘: Boot，数据盘: Data,网络盘：Udisk
+	Type string
+}
+
+/*
+UDSetUDHostAttribute - 私有专区对应的宿主机属性
+*/
+type UDSetUDHostAttribute struct {
+
+	// 是否绑定私有专区宿主机
+	HostBinding bool
+
+	// 私有专区宿主机
+	UDHostId string
+
+	// 私有专区
+	UDSetId string
+}
+
+/*
+UHostKeyPair - 主机密钥信息
+*/
+type UHostKeyPair struct {
+
+	// 密钥对ID
+	KeyPairId string
+
+	// 主机密钥对状态，Normal 正常，Deleted 删除
+	KeyPairState string
 }
 
 /*
@@ -454,7 +496,7 @@ type UHostInstanceSet struct {
 	// GPU个数
 	GPU int
 
-	// GPU类型;枚举值["K80", "P40", "V100", "T4", "T4S","2080Ti","2080Ti-4C","1080Ti", "T4/4", "MI100", "V100S"]
+	// GPU类型;枚举值["K80", "P40", "V100", "T4","T4A", "T4S","2080Ti","2080Ti-4C","1080Ti", "T4/4", "MI100", "V100S",2080","2080TiS","2080TiPro","3090","4090","4090Pro","A100","A800"]
 	GpuType string
 
 	// true: 开启 hidden kvm 功能；false: 不是
@@ -505,6 +547,9 @@ type UHostInstanceSet struct {
 	// 网络增强。Normal: 无；Super： 网络增强1.0； Ultra: 网络增强2.0
 	NetCapability string
 
+	// Firewall:防火墙,SecGroup:安全组,Acl:acl
+	NetFeatureTag string
+
 	// 【建议不再使用】网络状态。 连接：Connected， 断开：NotConnected
 	NetworkState string
 
@@ -523,7 +568,7 @@ type UHostInstanceSet struct {
 	// 仅抢占式实例返回，LowSpeed为低速模式，PowerOff为关机模式
 	RestrictMode string
 
-	// true: 绑定了安全组的主机；false: 不是
+	// 【待废弃】true: 绑定了安全组的主机；false: 不是
 	SecGroupInstance bool
 
 	// 竞价实例信息
@@ -597,6 +642,18 @@ type UHostTagSet struct {
 }
 
 /*
+DiskUpgradePriceDetail - 升级磁盘的详细价格
+*/
+type DiskUpgradePriceDetail struct {
+
+	// 快照的价格
+	Snapshot float64
+
+	// 磁盘的价格
+	UDisk float64
+}
+
+/*
 PriceDetail - 价格详细信息
 */
 type PriceDetail struct {
@@ -657,19 +714,4 @@ type UHostRefundPriceSet struct {
 
 	// UHost实例ID
 	UHostId string
-}
-
-/*
-BasePriceSet - 价格信息
-*/
-type BasePriceSet struct {
-
-	// 计费类型
-	ChargeType string
-
-	// 限时优惠的折前原价（即列表价乘以商务折扣后的单价）。
-	OriginalPrice float64
-
-	// 价格，单位: 元，保留小数点后两位有效数字
-	Price float64
 }
